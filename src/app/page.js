@@ -1,9 +1,10 @@
 import React from 'react'
+import Comingsoon from './components/Comingsoon'
 
 const page = () => {
   return (
-    <div className='text-5xl bg-red-500'>
-      hi
+    <div>
+      <Comingsoon/>
     </div>
   )
 }

@@ -56,7 +56,7 @@ export default function Comingsoon() {
       <footer className="w-full border-t border-slate-800 bg-neutral-950 py-4">
         <div className="container mx-auto px-6 text-center text-sm text-slate-500">
           © {new Date().getFullYear()} AptHire • Built with ❤️ by{" "}
-          <span className="text-indigo-400 font-medium">Anjul Rathor</span>
+        <a href="http://www.anjulrathor.com">  <span className="text-indigo-400 font-medium">Anjul Rathor</span> </a>
         </div>
       </footer>
 

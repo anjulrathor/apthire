@@ -1,10 +1,12 @@
 import React from 'react'
-import Hero from './components/home/Hero'
+import JobsList from '../components/jobs/JobsList'
 
 const page = () => {
   return (
     <div>
-      <Hero />
+
+        <JobsList />
+   
     </div>
   )
 }

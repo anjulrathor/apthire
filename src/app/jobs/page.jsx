@@ -1,5 +1,5 @@
 import React from 'react'
-import JobsList from '../components/jobs/JobsList'
+import JobsList from '@/components/jobs/JobsList'
 
 const page = () => {
   return (

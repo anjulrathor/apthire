@@ -1,7 +1,11 @@
 "use client";
 import React, { useState } from "react";
 
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+
 export default function SignUpPage() {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,7 +19,7 @@ export default function SignUpPage() {
     setError("");
     setSuccess("");
 
-    // Simple client-side validation
+    // Client-side validation
     if (!name.trim() || !email.trim() || !password) {
       setError("Please fill all required fields.");
       return;
@@ -31,21 +35,39 @@ export default function SignUpPage() {
 
     setLoading(true);
     try {
-      // Example POST - backend to implement in Step 2
-      const res = await fetch("/api/auth/signup", {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
+      const res = await fetch(`${API_BASE_URL}/api/users/register`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ name, email, password }),
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Signup failed");
+      let data;
+      const contentType = res.headers.get("content-type");
 
-      setSuccess("Account created. Please log in.");
+      if (contentType && contentType.includes("application/json")) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        throw new Error(text || "Signup failed");
+      }
+
+      if (!res.ok) {
+        throw new Error(data?.message || "Signup failed");
+      }
+
+      setSuccess("Account created successfully. Please log in.");
       setName("");
       setEmail("");
       setPassword("");
       setConfirm("");
+      
+      // Redirect to login
+      setTimeout(() => {
+          router.push("/login");
+      }, 1500);
     } catch (err) {
       setError(err.message || "Something went wrong.");
     } finally {
@@ -57,7 +79,9 @@ export default function SignUpPage() {
     <main className="min-h-screen bg-[#0d0d0d] text-white flex items-center justify-center py-16">
       <div className="w-full max-w-md p-6 rounded-lg bg-[#111111] border border-white/6 shadow-sm">
         <h1 className="font-head text-2xl mb-2">Create an account</h1>
-        <p className="text-sm text-gray-400 mb-4 font-main">Sign up to apply for jobs & chat with recruiters.</p>
+        <p className="text-sm text-gray-400 mb-4 font-main">
+          Sign up to apply for jobs & chat with recruiters.
+        </p>
 
         {error && <div className="mb-3 text-sm text-red-400">{error}</div>}
         {success && <div className="mb-3 text-sm text-emerald-300">{success}</div>}
@@ -118,7 +142,9 @@ export default function SignUpPage() {
 
         <div className="mt-4 text-sm text-gray-400">
           Already have an account?{" "}
-          <a href="/login" className="text-emerald-400 hover:underline">Sign in</a>
+          <a href="/login" className="text-emerald-400 hover:underline">
+            Sign in
+          </a>
         </div>
       </div>
     </main>

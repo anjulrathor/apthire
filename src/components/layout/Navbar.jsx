@@ -3,7 +3,10 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
+import { useAuth } from "@/context/AuthContext";
+
 export default function Navbar() {
+  const { user, logout } = useAuth();
   const [open, setOpen] = useState(false); 
   const [showTinySearch, setShowTinySearch] = useState(false);
   const [tinyQ, setTinyQ] = useState("");
@@ -89,22 +92,57 @@ export default function Navbar() {
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">3</span>
             </button>
 
-            {/* Post Job */}
-            <Link
-              href="/post-job"
-              className="hidden sm:inline-flex items-center px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-sm font-alt transition"
-            >
-              Post Job
-            </Link>
+            {/* Dynamic Auth Links */}
+            {user ? (
+              <>
+                {/* User Info / Profile Link */}
+                <div className="hidden md:flex items-center gap-2">
+                  <span className="text-sm font-main text-gray-300">
+                    Hello, <span className="text-white">{user.name}</span>
+                  </span>
+                </div>
 
-            {/* Avatar */}
-            <Image
-              src="/images/home/me.png"
-              alt="avatar"
-              width={36}
-              height={36}
-              className="rounded-full border border-white/10 object-cover"
-            />
+                {user.role === 'admin' && (
+                   <Link 
+                     href="/admin"
+                     className="px-3 py-1.5 rounded-md bg-purple-600 hover:bg-purple-700 text-sm font-alt transition"
+                   >
+                     Admin
+                   </Link>
+                )}
+
+                 {/* Post Job (Admin/Recruiter only) */}
+                 {(user.role === 'admin' || user.role === 'recruiter') && (
+                   <Link
+                    href="/post-job"
+                    className="hidden sm:inline-flex items-center px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-sm font-alt transition"
+                  >
+                    Post Job
+                  </Link>
+                 )}
+
+                <button 
+                  onClick={logout}
+                  className="text-sm text-gray-400 hover:text-white transition"
+                >
+                  Logout
+                </button>
+                
+                 {/* Avatar */}
+                 <Image
+                  src="/images/home/me.png"
+                  alt="avatar"
+                  width={36}
+                  height={36}
+                  className="rounded-full border border-white/10 object-cover"
+                />
+              </>
+            ) : (
+              <div className="flex items-center gap-4 text-sm font-alt">
+                <Link href="/login" className="text-gray-300 hover:text-white transition">LOGIN</Link>
+                <Link href="/signup" className="text-emerald-400 hover:text-emerald-300 transition">SIGNUP</Link>
+              </div>
+            )}
 
             {/* Mobile Menu Trigger */}
             <button onClick={() => setOpen(!open)} className="md:hidden p-2">

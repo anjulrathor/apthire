@@ -1,7 +1,11 @@
 "use client";
 import React, { useState } from "react";
 
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,7 +24,8 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/login", {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
+      const res = await fetch(`${API_BASE_URL}/api/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -30,13 +35,23 @@ export default function LoginPage() {
       if (!res.ok) throw new Error(data?.message || "Login failed");
 
       // Successful login: backend should return JWT & user details
-      // Example: localStorage.setItem("token", data.token);
-      setSuccess("Logged in successfully.");
-      // store token if provided (we'll implement backend next)
-      if (data?.token) localStorage.setItem("token", data.token);
+      setSuccess("Logged in successfully. Redirecting...");
+      
+      if (data?.token) {
+        localStorage.setItem("token", data.token);
+        // Store user info for global access
+        localStorage.setItem("user", JSON.stringify({
+            _id: data._id,
+            name: data.name,
+            email: data.email,
+            role: data.role
+        }));
+      }
 
-      // optionally redirect (later)
-      // window.location.href = "/dashboard";
+      // Redirect to home
+      setTimeout(() => {
+        router.push("/");
+      }, 1000);
     } catch (err) {
       setError(err.message || "Something went wrong.");
     } finally {

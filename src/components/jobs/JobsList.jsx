@@ -9,58 +9,53 @@ import Image from "next/image";
  * - Works with sample data; later replace `jobsData` with API data
  */
 
-const jobsData = [
-  {
-    id: 1,
-    title: "Junior MERN Developer",
-    company: "Acme Labs",
-    logo: "/logo-acme.png", // replace or use /logo.png
-    skills: ["React", "Node", "MongoDB"],
-    exp: "0-1 yrs",
-    location: "Remote",
-    salary: "₹18k - ₹25k",
-    postedAt: "3 days ago",
-  },
-  {
-    id: 2,
-    title: "Frontend Intern (React)",
-    company: "Startup X",
-    logo: "/logo-startupx.png",
-    skills: ["React", "Tailwind"],
-    exp: "0 yrs",
-    location: "Delhi",
-    salary: "Internship",
-    postedAt: "1 day ago",
-  },
-  {
-    id: 3,
-    title: "Backend Developer (Node.js)",
-    company: "TechWorks",
-    logo: "/logo-techworks.png",
-    skills: ["Node", "Express", "MongoDB"],
-    exp: "1-2 yrs",
-    location: "Bengaluru",
-    salary: "₹30k - ₹45k",
-    postedAt: "7 days ago",
-  },
-  // add more sample items as needed
-];
+import { useAuth } from "@/context/AuthContext";
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
 
 export default function JobsList() {
+  const { user } = useAuth();
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   const [q, setQ] = useState("");
   const [skillFilter, setSkillFilter] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
-  const [visible, setVisible] = useState(6); // pagination: show 6 then load more
+  const [visible, setVisible] = useState(6);
+
+  // Fetch jobs on mount
+  React.useEffect(() => {
+    async function fetchJobs() {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/jobs`);
+        if (!res.ok) throw new Error("Failed to fetch jobs");
+        const data = await res.json();
+        if (data.success) {
+           setJobs(data.count ? data.jobs : []); // API returns { success: true, count: N, data: [...] } or checks backend
+           // Backend controller `getJobs` returns: { success: true, count: N, jobs: [...] }
+        }
+      } catch (err) {
+        console.error(err);
+        setError("Could not load jobs. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchJobs();
+  }, []);
 
   // all skills for quick-filter buttons
   const allSkills = useMemo(() => {
+    if(!jobs) return [];
     const s = new Set();
-    jobsData.forEach((j) => j.skills.forEach((k) => s.add(k)));
+    jobs.forEach((j) => j.skills.forEach((k) => s.add(k)));
     return Array.from(s);
-  }, []);
+  }, [jobs]);
 
   const filtered = useMemo(() => {
-    return jobsData.filter((job) => {
+    if(!jobs) return [];
+    return jobs.filter((job) => {
       const matchQ =
         !q ||
         job.title.toLowerCase().includes(q.toLowerCase()) ||
@@ -70,11 +65,17 @@ export default function JobsList() {
       const matchLoc = !locationFilter || job.location.toLowerCase().includes(locationFilter.toLowerCase());
       return matchQ && matchSkill && matchLoc;
     });
-  }, [q, skillFilter, locationFilter]);
+  }, [jobs, q, skillFilter, locationFilter]);
 
   return (
     <section className="w-full bg-[#0d0d0d] text-white py-12">
       <div className="max-w-6xl mx-auto px-4">
+        
+        {loading && <div className="text-gray-400">Loading jobs...</div>}
+        {error && <div className="text-red-400">{error}</div>}
+
+        {!loading && !error && (
+            <>
 
         {/* header + filters */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
@@ -166,12 +167,24 @@ export default function JobsList() {
                 </div>
 
                 <div className="mt-3 flex items-center gap-3">
-                  <button className="text-sm px-3 py-1 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-alt">
-                    Apply
-                  </button>
-                  <button className="text-sm px-3 py-1 rounded-md border border-white/6 text-gray-200 font-main">
-                    Save
-                  </button>
+                  {/* Role-based actions */}
+                  {user?.role === 'admin' ? (
+                     <button 
+                       className="text-sm px-3 py-1 rounded-md bg-red-600 hover:bg-red-700 text-white font-alt"
+                       onClick={() => alert("Delete functionality to be implemented in Phase 5")}
+                     >
+                       Delete
+                     </button>
+                  ) : (
+                    <>
+                      <button className="text-sm px-3 py-1 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-alt">
+                        Apply
+                      </button>
+                      <button className="text-sm px-3 py-1 rounded-md border border-white/6 text-gray-200 font-main">
+                        Save
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             </article>
@@ -193,6 +206,8 @@ export default function JobsList() {
             <div className="text-sm text-gray-400">End of results</div>
           )}
         </div>
+        </>
+        )}
       </div>
     </section>
   );

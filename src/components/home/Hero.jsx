@@ -174,7 +174,14 @@ export default function Hero() {
 
   function onSearch(e) {
     e.preventDefault();
-    console.log("Search", { query, experience, location, activeTags });
+    // Build query string for jobs page
+    const params = new URLSearchParams();
+    if (query) params.set('q', query);
+    if (experience && experience !== 'any') params.set('exp', experience);
+    if (location) params.set('loc', location);
+    
+    // Navigate to jobs page with filters
+    window.location.href = `/jobs?${params.toString()}`;
   }
 
   return (

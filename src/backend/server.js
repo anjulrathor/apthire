@@ -31,6 +31,7 @@ connectDB();
 // Routes
 app.use("/api/users", userRoutes);
 app.use("/api/jobs", jobRoutes);
+app.use("/api/applications", require("./routes/applicationRoutes"));
 app.use("/api/admin", dashboardRoutes);
 
 // Port

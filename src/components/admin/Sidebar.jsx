@@ -9,7 +9,7 @@ export default function AdminSidebar() {
     { name: 'Dashboard', href: '/admin' },
     { name: 'Users', href: '/admin/users' },
     { name: 'Jobs', href: '/admin/jobs' },
-    // { name: 'Settings', href: '/admin/settings' }, // Future
+    { name: 'Applications', href: '/admin/applications' },
   ];
 
   return (

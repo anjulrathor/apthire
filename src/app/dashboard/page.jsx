@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Avatar from "@/components/ui/Avatar";
 
 export default function DashboardPage() {
   const { user, loading } = useAuth();
@@ -25,30 +26,41 @@ export default function DashboardPage() {
   return (
     <main className="min-h-screen bg-[#0d0d0d] text-white py-16 px-4">
       <div className="max-w-4xl mx-auto">
-        <header className="mb-8 border-b border-white/10 pb-6">
-          <h1 className="text-3xl font-head font-bold">Dashboard</h1>
-          <p className="text-gray-400 mt-2 font-main">
-            Welcome back, <span className="text-emerald-400">{user.name}</span>!
-          </p>
+        <header className="mb-8 border-b border-white/10 pb-6 flex items-center gap-6">
+          <Avatar name={user.name} size="xl" />
+          <div>
+              <h1 className="text-3xl font-head font-bold">Dashboard</h1>
+              <p className="text-gray-400 mt-1 font-main">
+                Welcome back, <span className="text-white font-medium">{user.name}</span>!
+              </p>
+          </div>
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Quick Actions */}
           <section className="bg-[#111111] border border-white/10 rounded-xl p-6">
-            <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
-            <div className="flex flex-col gap-3">
+            <h2 className="text-xl font-bold mb-4 font-head">Quick Actions</h2>
+            <div className="grid grid-cols-2 gap-3">
               <Link
                 href="/jobs"
-                className="block w-full text-center py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition"
+                className="flex items-center justify-center py-3 rounded-lg bg-emerald-600/10 text-emerald-400 hover:bg-emerald-600 hover:text-white font-medium transition border border-emerald-600/20"
               >
                 Browse Jobs
               </Link>
               <Link
                 href="/profile"
-                className="block w-full text-center py-2 rounded-md bg-white/5 hover:bg-white/10 text-white font-medium transition"
+                className="flex items-center justify-center py-3 rounded-lg bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white font-medium transition border border-white/10"
               >
-                View Profile
+                Profile
               </Link>
+              {(user.role === 'admin' || user.role === 'recruiter') && (
+                 <Link
+                   href="/post-job"
+                   className="col-span-2 flex items-center justify-center py-3 rounded-lg bg-blue-600/10 text-blue-400 hover:bg-blue-600 hover:text-white font-medium transition border border-blue-600/20"
+                 >
+                   Post a New Job
+                 </Link>
+              )}
             </div>
           </section>
 

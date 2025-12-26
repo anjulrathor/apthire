@@ -1,13 +1,11 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
   useEffect(() => {
     // Check localStorage on mount
@@ -30,14 +28,22 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("user", JSON.stringify(userData));
     localStorage.setItem("token", token);
     setUser(userData);
-    router.push("/");
+    
+    // Immediate Role Redirect using window.location for reliability
+    if (userData.role === 'admin') {
+      window.location.href = "/admin";
+    } else if (userData.role === 'recruiter') {
+      window.location.href = "/recruiter";
+    } else {
+      window.location.href = "/jobs";
+    }
   };
 
   const logout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
     setUser(null);
-    router.push("/login");
+    window.location.href = "/login";
   };
 
   return (

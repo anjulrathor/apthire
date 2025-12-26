@@ -1,35 +1,33 @@
 "use client";
 import React, { useState } from "react";
+import { useToast } from "@/context/ToastContext";
 
-
-import { useRouter } from "next/navigation";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
 
 export default function SignUpPage() {
-  const router = useRouter();
+  const { error: toastError, success } = useToast();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [role, setRole] = useState("candidate"); // 'candidate' | 'recruiter'
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setError("");
-    setSuccess("");
 
     // Client-side validation
     if (!name.trim() || !email.trim() || !password) {
-      setError("Please fill all required fields.");
+      toastError("Please fill all required fields.");
       return;
     }
     if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
+      toastError("Password must be at least 6 characters.");
       return;
     }
     if (password !== confirm) {
-      setError("Passwords do not match.");
+        toastError("Passwords do not match.");
       return;
     }
 
@@ -41,7 +39,7 @@ export default function SignUpPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, role }),
       });
 
       let data;
@@ -58,7 +56,7 @@ export default function SignUpPage() {
         throw new Error(data?.message || "Signup failed");
       }
 
-      setSuccess("Account created successfully. Please log in.");
+      success("Account created! Redirecting to login...");
       setName("");
       setEmail("");
       setPassword("");
@@ -66,10 +64,10 @@ export default function SignUpPage() {
       
       // Redirect to login
       setTimeout(() => {
-          router.push("/login");
+          window.location.href = "/login";
       }, 1500);
     } catch (err) {
-      setError(err.message || "Something went wrong.");
+        toastError(err.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
@@ -82,9 +80,24 @@ export default function SignUpPage() {
         <p className="text-sm text-gray-400 mb-4 font-main">
           Sign up to apply for jobs & chat with recruiters.
         </p>
-
-        {error && <div className="mb-3 text-sm text-red-400">{error}</div>}
-        {success && <div className="mb-3 text-sm text-emerald-300">{success}</div>}
+        
+        {/* Role Helper */}
+        <div className="flex bg-[#0d0d0d] p-1 rounded-lg border border-white/10 mb-6">
+            <button 
+              type="button" 
+              onClick={() => setRole('candidate')}
+              className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${role === 'candidate' ? 'bg-emerald-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+            >
+                🎓 Candidate
+            </button>
+            <button 
+              type="button" 
+              onClick={() => setRole('recruiter')}
+              className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${role === 'recruiter' ? 'bg-emerald-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+            >
+                🏢 Recruiter
+            </button>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>

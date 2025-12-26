@@ -9,16 +9,18 @@ const generateToken = (id) => {
   });
 };
 
+// Hardcoded Admin Whitelist
+const ADMIN_EMAILS = [
+    "admin@apthire.com",
+    "ceo@apthire.com"
+];
+
 // @desc    Register new user
 // @route   POST /api/users
 // @access  Public
 const registerUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
-
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: "Please add all fields" });
-    }
 
     // Check if user exists
     const userExists = await User.findOne({ email });
@@ -27,12 +29,21 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
+    // Determine Role
+    let finalRole = role || "candidate"; // Default
+    if (ADMIN_EMAILS.includes(email.toLowerCase())) {
+        finalRole = "admin";
+    } else if (role === "admin") {
+        // Prevent manual admin creation not in whitelist
+        finalRole = "candidate"; 
+    }
+
     // Create user
     const user = await User.create({
       name,
       email,
       password,
-      role: role || "jobseeker",
+      role: finalRole
     });
 
     if (user) {
@@ -48,7 +59,7 @@ const registerUser = async (req, res) => {
       res.status(400).json({ message: "Invalid user data" });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
 
@@ -63,6 +74,12 @@ const loginUser = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (user && (await user.matchPassword(password))) {
+      // Self-healing: Enforce admin role if in whitelist (fixes stale data)
+      if (ADMIN_EMAILS.includes(email.toLowerCase()) && user.role !== 'admin') {
+          user.role = 'admin';
+          await user.save();
+      }
+
       res.json({
         success: true,
         _id: user.id,
@@ -128,4 +145,50 @@ const deleteUser = async (req, res) => {
     }
   };
 
-module.exports = { registerUser, loginUser, getUsers, deleteUser };
+// @desc    Get user data
+// @route   GET /api/users/me
+// @access  Private
+const getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Update user profile
+// @route   PUT /api/users/profile
+// @access  Private
+const updateUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (user) {
+      user.name = req.body.name || user.name;
+      
+      // Update nested profile fields if provided
+      if (req.body.profile) {
+        user.profile = { ...user.profile, ...req.body.profile };
+      }
+
+      const updatedUser = await user.save();
+
+      res.json({
+        success: true,
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        profile: updatedUser.profile,
+        token: generateToken(updatedUser._id),
+      });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { registerUser, loginUser, getUsers, deleteUser, getMe, updateUserProfile };

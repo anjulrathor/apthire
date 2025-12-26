@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import { useAuth } from "@/context/AuthContext";
+import UserMenu from "../ui/UserMenu";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -55,7 +56,9 @@ export default function Navbar() {
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
-                      console.log("tiny search:", tinyQ);
+                      if (tinyQ.trim()) {
+                        window.location.href = `/jobs?q=${encodeURIComponent(tinyQ)}`;
+                      }
                       setShowTinySearch(false);
                     }}
                     className="flex items-center gap-2"
@@ -95,47 +98,18 @@ export default function Navbar() {
             {/* Dynamic Auth Links */}
             {user ? (
               <>
-                {/* User Info / Profile Link */}
-                <div className="hidden md:flex items-center gap-2">
-                  <span className="text-sm font-main text-gray-300">
-                    Hello, <span className="text-white">{user.name}</span>
-                  </span>
-                </div>
-
-                {user.role === 'admin' && (
-                   <Link 
-                     href="/admin"
-                     className="px-3 py-1.5 rounded-md bg-purple-600 hover:bg-purple-700 text-sm font-alt transition"
-                   >
-                     Admin
-                   </Link>
-                )}
-
+                {/* User Dropdown */}
+                 <UserMenu />
+                 
                  {/* Post Job (Admin/Recruiter only) */}
                  {(user.role === 'admin' || user.role === 'recruiter') && (
                    <Link
-                    href="/post-job"
+                    href={user.role === 'admin' ? "/admin/jobs/new" : "/recruiter/jobs/new"}
                     className="hidden sm:inline-flex items-center px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-sm font-alt transition"
                   >
                     Post Job
                   </Link>
                  )}
-
-                <button 
-                  onClick={logout}
-                  className="text-sm text-gray-400 hover:text-white transition"
-                >
-                  Logout
-                </button>
-                
-                 {/* Avatar */}
-                 <Image
-                  src="/images/home/me.png"
-                  alt="avatar"
-                  width={36}
-                  height={36}
-                  className="rounded-full border border-white/10 object-cover"
-                />
               </>
             ) : (
               <div className="flex items-center gap-4 text-sm font-alt">

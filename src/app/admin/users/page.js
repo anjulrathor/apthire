@@ -1,13 +1,19 @@
 "use client";
 import React, { useEffect, useState } from "react";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
+
 export default function UsersPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch("/api/users");
+      const res = await fetch(`${API_BASE_URL}/api/users`, {
+          headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+      });
       const data = await res.json();
       if (data.success) {
         setUsers(data.users);
@@ -26,8 +32,11 @@ export default function UsersPage() {
   const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this user?")) return;
     try {
-      const res = await fetch(`/api/users/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/users/${id}`, {
         method: "DELETE",
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
       });
       const data = await res.json();
       if (data.success) {

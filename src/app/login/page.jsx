@@ -1,24 +1,20 @@
 "use client";
 import React, { useState } from "react";
-
-
-import { useRouter } from "next/navigation";
+import { useToast } from "@/context/ToastContext";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
-  const router = useRouter();
+  const { login } = useAuth();
+  const { error: toastError, success } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   async function handleLogin(e) {
     e.preventDefault();
-    setError("");
-    setSuccess("");
 
     if (!email.trim() || !password) {
-      setError("Please enter email and password.");
+      toastError("Please enter email and password.");
       return;
     }
 
@@ -34,26 +30,20 @@ export default function LoginPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.message || "Login failed");
 
-      // Successful login: backend should return JWT & user details
-      setSuccess("Logged in successfully. Redirecting...");
+      // Successful login
+      success("Welcome back! Redirecting...");
       
       if (data?.token) {
-        localStorage.setItem("token", data.token);
-        // Store user info for global access
-        localStorage.setItem("user", JSON.stringify({
+        // Use the context login function to handle state and redirects
+        login({
             _id: data._id,
             name: data.name,
             email: data.email,
             role: data.role
-        }));
+        }, data.token);
       }
-
-      // Redirect to home
-      setTimeout(() => {
-        router.push("/");
-      }, 1000);
     } catch (err) {
-      setError(err.message || "Something went wrong.");
+      toastError(err.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
@@ -64,9 +54,6 @@ export default function LoginPage() {
       <div className="w-full max-w-md p-6 rounded-lg bg-[#111111] border border-white/6 shadow-sm">
         <h1 className="font-head text-2xl mb-2">Sign in</h1>
         <p className="text-sm text-gray-400 mb-4 font-main">Access your Apthire account.</p>
-
-        {error && <div className="mb-3 text-sm text-red-400">{error}</div>}
-        {success && <div className="mb-3 text-sm text-emerald-300">{success}</div>}
 
         <form onSubmit={handleLogin} className="space-y-3">
           <div>

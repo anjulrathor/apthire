@@ -37,19 +37,35 @@ const jobSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please enter job description"],
     },
+    requirements: {
+      type: String, // Bullet points or rich text
+      required: false
+    },
+    employmentType: {
+      type: String,
+      enum: ['Full-time', 'Part-time', 'Contract', 'Internship'],
+      default: 'Full-time'
+    },
     postedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: false // Optional for now, can be strict later
+        required: true
     },
-    isActive: {
-        type: Boolean,
-        default: true
+    status: {
+        type: String,
+        enum: ['active', 'closed'],
+        default: 'active'
     }
   },
   {
     timestamps: true,
   }
 );
+
+// Indexes for text search and filtering
+jobSchema.index({ title: "text", company: "text" }); 
+jobSchema.index({ skills: 1 });
+jobSchema.index({ location: 1 });
+jobSchema.index({ postedBy: 1 });
 
 module.exports = mongoose.model("Job", jobSchema);

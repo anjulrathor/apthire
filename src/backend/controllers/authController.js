@@ -18,8 +18,9 @@ passport.use(
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: process.env.GOOGLE_CALLBACK_URL || "http://localhost:5001/api/auth/google/callback",
+      passReqToCallback: true, // Allow us to see the request for dynamic URL detection
     },
-    async (accessToken, refreshToken, profile, done) => {
+    async (req, accessToken, refreshToken, profile, done) => {
       try {
         console.log("Google OAuth callback triggered");
         console.log("Profile:", profile.emails[0].value);
@@ -91,25 +92,38 @@ passport.deserializeUser(async (id, done) => {
 // @desc    Initiate Google OAuth
 // @route   GET /api/auth/google
 // @access  Public
-const googleAuth = passport.authenticate("google", {
-  scope: ["profile", "email"],
-});
+const googleAuth = (req, res, next) => {
+  const isLocal = req.get('host').includes('localhost');
+  const callbackURL = isLocal 
+    ? (process.env.GOOGLE_CALLBACK_URL || "http://localhost:5001/api/auth/google/callback")
+    : (process.env.PROD_GOOGLE_CALLBACK_URL || "https://apthire.vercel.app/api/auth/google/callback");
+
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+    callbackURL: callbackURL,
+  })(req, res, next);
+};
 
 // @desc    Google OAuth callback
 // @route   GET /api/auth/google/callback
 // @access  Public
 const googleCallback = (req, res, next) => {
+  const isLocal = req.get('host').includes('localhost');
+  const frontendUrl = isLocal 
+    ? (process.env.FRONTEND_URL || 'http://localhost:3000')
+    : (process.env.PROD_FRONTEND_URL || 'https://apthire.vercel.app');
+
   passport.authenticate("google", { session: false }, (err, user, info) => {
     console.log("Google callback handler called");
     
     if (err) {
       console.error("Authentication error:", err);
-      return res.redirect(`http://localhost:3000/login?error=authentication_failed`);
+      return res.redirect(`${frontendUrl}/login?error=authentication_failed`);
     }
 
     if (!user) {
       console.error("No user returned from Google");
-      return res.redirect(`http://localhost:3000/login?error=no_user`);
+      return res.redirect(`${frontendUrl}/login?error=no_user`);
     }
 
     console.log("User authenticated:", user.email);
@@ -128,16 +142,15 @@ const googleCallback = (req, res, next) => {
     console.log("Redirecting user with role:", user.role);
 
     // Redirect to frontend with token and user data
-    // If role is null, redirect to role selection page
     if (!user.role) {
       return res.redirect(
-        `http://localhost:3000/select-role?token=${token}&user=${encodeURIComponent(JSON.stringify(userData))}`
+        `${frontendUrl}/select-role?token=${token}&user=${encodeURIComponent(JSON.stringify(userData))}`
       );
     }
 
     // If role is set, redirect to callback handler
     return res.redirect(
-      `http://localhost:3000/auth/google/callback?token=${token}&user=${encodeURIComponent(JSON.stringify(userData))}`
+      `${frontendUrl}/auth/google/callback?token=${token}&user=${encodeURIComponent(JSON.stringify(userData))}`
     );
   })(req, res, next);
 };

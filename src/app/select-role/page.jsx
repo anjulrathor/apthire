@@ -6,6 +6,7 @@ import { useToast } from "@/context/ToastContext";
 export default function SelectRolePage() {
   const searchParams = useSearchParams();
   const { error: toastError, success } = useToast();
+  const { login } = useAuth();
   const [selectedRole, setSelectedRole] = useState("");
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState("");
@@ -45,23 +46,15 @@ export default function SelectRolePage() {
 
       success("Role set successfully! Redirecting...");
       
-      // Store updated user data and token
-      localStorage.setItem("user", JSON.stringify({
+      const updatedUserData = {
         _id: data._id,
         name: data.name,
         email: data.email,
         role: data.role,
-      }));
-      localStorage.setItem("token", data.token);
+      };
 
-      // Redirect based on role
-      setTimeout(() => {
-        if (data.role === "recruiter") {
-          window.location.href = "/recruiter";
-        } else {
-          window.location.href = "/jobs";
-        }
-      }, 1000);
+      // Use the context login function to handle state and redirects
+      login(updatedUserData, data.token);
     } catch (err) {
       toastError(err.message || "Something went wrong.");
     } finally {

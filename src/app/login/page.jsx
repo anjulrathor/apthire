@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useToast } from "@/context/ToastContext";
 import { useAuth } from "@/context/AuthContext";
+import Logo from "@/components/ui/Logo";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -59,6 +60,9 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
+          <div className="flex justify-center mb-6">
+            <Logo size="lg" />
+          </div>
           <h1 className="font-head text-3xl sm:text-4xl mb-3 bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">
             Welcome Back
           </h1>

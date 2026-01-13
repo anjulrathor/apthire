@@ -4,6 +4,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { AuthProvider } from "@/context/AuthContext";
 import { ToastProvider } from "@/context/ToastContext";
+import LoginPrompt from "@/components/ui/LoginPrompt";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -18,9 +19,9 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "Apthire | Skill-First Hiring Platform",
-  description: "Simple, skill-first hiring for freshers and startups. Find jobs based on your skills and projects, not just degrees.",
-  keywords: "jobs, hiring, freshers, startups, skill-first, recruitment, apthire",
+  title: "Apthire | Remote Overseas Jobs for Indian Talent",
+  description: "Land high-paying tech jobs in the US, Europe, and UAE directly from India. Skill-based hiring for global startups.",
+  keywords: "remote jobs india, overseas software jobs, US tech jobs from india, Apthire, skill-based hiring, international remote work",
 };
 
 export const viewport = {
@@ -43,6 +44,7 @@ export default function RootLayout({ children }) {
                 {children}
               </main>
               <Footer />
+              <LoginPrompt />
             </div>
           </ToastProvider>
         </AuthProvider>

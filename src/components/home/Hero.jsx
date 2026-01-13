@@ -131,25 +131,31 @@ export default function Hero() {
         
         {/* Badge */}
         <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-bold mb-8 uppercase tracking-widest"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white text-[10px] font-bold mb-10 uppercase tracking-[0.2em] relative overflow-hidden group shadow-2xl"
         >
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 via-transparent to-emerald-500/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            Platform is Live
+            New: Skill-based challenges live
         </motion.div>
 
         {/* Hero Content */}
         <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="font-head text-4xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight tracking-tight"
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="font-head text-5xl sm:text-7xl lg:text-8xl font-black text-white mb-8 leading-[1.1] tracking-[-0.04em]"
         >
-            Hire on <span className="text-emerald-500 tracking-tighter">Skills</span>,<br className="hidden sm:block" /> Not Just Degrees.
+            Land <span className="relative inline-block">
+              <span className="bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500 bg-clip-text text-transparent">Overseas</span>
+              <span className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-emerald-500/0 via-emerald-500/50 to-emerald-500/0 rounded-full"></span>
+            </span> Jobs,<br className="hidden sm:block" /> 
+            <span className="text-white/40 italic font-light text-3xl sm:text-5xl">Directly from</span> 
+            <span className="ml-3 inline-block bg-white/5 border border-white/10 px-4 py-1 rounded-2xl text-white text-3xl sm:text-5xl align-middle transform -rotate-1">India.</span>
         </motion.h1>
 
         <motion.p 
@@ -158,8 +164,8 @@ export default function Hero() {
             transition={{ delay: 0.2 }}
             className="max-w-2xl mx-auto text-gray-400 text-lg sm:text-xl mb-12 font-main leading-relaxed"
         >
-            Apthire connects talented developers with high-growth companies. 
-            Showcase your skills, find remote roles, and build your career on projects.
+            Apthire connects India's top tech talent with high-growth startups in the US, Europe, and UAE. 
+            Skip the visa hassle—work remotely for global teams based on your skills.
         </motion.p>
 
         {/* Search Bar */}

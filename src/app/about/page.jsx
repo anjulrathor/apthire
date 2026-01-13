@@ -31,7 +31,7 @@ export default function AboutPage() {
             animate={{ opacity: 1, y: 0 }}
             className="font-head text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight"
           >
-            Our Mission is <span className="text-emerald-500">Simple</span>.
+            Our Mission is <span className="text-emerald-500">Global</span>.
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -39,8 +39,8 @@ export default function AboutPage() {
             transition={{ delay: 0.1 }}
             className="text-gray-400 text-lg md:text-xl max-w-3xl mx-auto font-main leading-relaxed"
           >
-            Apthire is a skill-first platform designed to level the playing field for freshers and junior developers. 
-            We believe your potential is defined by what you can build, not by your degree.
+            Apthire is a premier platform dedicated to helping Indian engineers land roles in world-class companies across the US, Europe, and Asia. 
+            We believe geographic boundaries shouldn't limit your career potential.
           </motion.p>
         </section>
 

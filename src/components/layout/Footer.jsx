@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Logo from "../ui/Logo";
 
 export default function Footer() {
   return (
@@ -9,12 +10,9 @@ export default function Footer() {
           
           {/* Brand Col */}
           <div className="col-span-2 lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <span className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center font-bold text-white">A</span>
-              <span className="font-head font-bold text-white text-xl tracking-tight">Apthire</span>
-            </Link>
+            <Logo size="md" className="mb-4" />
             <p className="text-sm max-w-xs mb-6">
-              Empowering the next generation of talent through skill-first hiring. Find your dream job based on what you can do, not where you studied.
+              Empowering Indian tech talent to secure high-paying overseas roles. Bridge the gap between India and the global startup ecosystem.
             </p>
             <div className="flex space-x-4">
               {['twitter', 'github', 'linkedin'].map(social => (
@@ -35,6 +33,7 @@ export default function Footer() {
               <li><Link href="/jobs" className="hover:text-emerald-400 transition-colors">Browse Jobs</Link></li>
               <li><Link href="/companies" className="hover:text-emerald-400 transition-colors">Companies</Link></li>
               <li><Link href="/services" className="hover:text-emerald-400 transition-colors">Our Services</Link></li>
+              <li><Link href="/pricing" className="hover:text-emerald-400 transition-colors">Pricing</Link></li>
               <li><Link href="/post-job" className="hover:text-emerald-400 transition-colors">Post a Job</Link></li>
             </ul>
           </div>

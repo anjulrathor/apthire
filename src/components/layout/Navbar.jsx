@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import UserMenu from "../ui/UserMenu";
+import Logo from "../ui/Logo";
 
 export default function Navbar() {
   const { user } = useAuth();
@@ -29,12 +30,8 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-12 sm:h-16">
           
-          {/* Logo Section */}
           <div className="flex items-center">
-            <Link href="/" className="flex-shrink-0 flex items-center gap-2">
-              <span className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-emerald-600 flex items-center justify-center font-bold text-lg sm:text-xl shadow-lg shadow-emerald-500/20">A</span>
-              <span className="font-head font-bold text-xl sm:text-2xl tracking-tight hidden sm:block">Apthire</span>
-            </Link>
+            <Logo size="md" />
           </div>
 
           {/* Desktop Navigation */}
@@ -42,6 +39,7 @@ export default function Navbar() {
             <Link href="/jobs" className="text-gray-300 hover:text-emerald-400 font-medium transition-colors">Jobs</Link>
             <Link href="/companies" className="text-gray-300 hover:text-emerald-400 font-medium transition-colors">Companies</Link>
             <Link href="/services" className="text-gray-300 hover:text-emerald-400 font-medium transition-colors">Services</Link>
+            <Link href="/pricing" className="text-gray-300 hover:text-emerald-400 font-medium transition-colors">Pricing</Link>
           </nav>
 
           {/* Right Section */}
@@ -134,6 +132,7 @@ export default function Navbar() {
           <Link href="/jobs" onClick={() => setIsOpen(false)} className="block px-3 py-4 text-base font-medium text-gray-300 hover:text-emerald-400 hover:bg-white/5 rounded-lg transition">Jobs List</Link>
           <Link href="/companies" onClick={() => setIsOpen(false)} className="block px-3 py-4 text-base font-medium text-gray-300 hover:text-emerald-400 hover:bg-white/5 rounded-lg transition">Explore Companies</Link>
           <Link href="/services" onClick={() => setIsOpen(false)} className="block px-3 py-4 text-base font-medium text-gray-300 hover:text-emerald-400 hover:bg-white/5 rounded-lg transition">Our Services</Link>
+          <Link href="/pricing" onClick={() => setIsOpen(false)} className="block px-3 py-4 text-base font-medium text-gray-300 hover:text-emerald-400 hover:bg-white/5 rounded-lg transition">Pricing Plans</Link>
           {user && (user.role === 'admin' || user.role === 'recruiter') && (
             <Link href={user.role === 'admin' ? "/admin/jobs/new" : "/recruiter/jobs/new"} onClick={() => setIsOpen(false)} className="block px-3 py-4 text-base font-medium text-emerald-400 hover:bg-emerald-400/10 rounded-lg transition">Post a Job</Link>
           )}

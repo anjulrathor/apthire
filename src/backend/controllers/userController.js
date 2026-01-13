@@ -191,4 +191,62 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, getUsers, deleteUser, getMe, updateUserProfile };
+// @desc    Update user role (for new Google OAuth users)
+// @route   PUT /api/users/role
+// @access  Private
+const updateUserRole = async (req, res) => {
+  try {
+    const { role } = req.body;
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Only allow role update if current role is null/undefined
+    if (user.role) {
+      return res.status(400).json({ 
+        message: "Role already set. Cannot change role." 
+      });
+    }
+
+    // Prevent self-assignment of admin role
+    if (role === "admin") {
+      return res.status(403).json({ 
+        message: "Cannot self-assign admin role" 
+      });
+    }
+
+    // Validate role
+    if (!["candidate", "recruiter"].includes(role)) {
+      return res.status(400).json({ 
+        message: "Invalid role. Must be 'candidate' or 'recruiter'" 
+      });
+    }
+
+    user.role = role;
+    await user.save();
+
+    res.json({
+      success: true,
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      token: generateToken(user._id),
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { 
+  registerUser, 
+  loginUser, 
+  getUsers, 
+  deleteUser, 
+  getMe, 
+  updateUserProfile,
+  updateUserRole,
+  ADMIN_EMAILS // Export for use in authController
+};

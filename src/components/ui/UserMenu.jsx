@@ -3,12 +3,10 @@ import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import Avatar from "./Avatar";
-import { useToast } from "@/context/ToastContext";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function UserMenu() {
   const { user, logout } = useAuth();
-  const { success } = useToast();
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -83,7 +81,6 @@ export default function UserMenu() {
             <button
               onClick={() => {
                 setOpen(false);
-                success("Logged out successfully");
                 logout();
               }}
               className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 transition-colors"

@@ -1,115 +1,83 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
-import { useMotionValue, animate } from "framer-motion";
+import { useMotionValue, animate, motion } from "framer-motion";
 
-/**
- * components/Hero.jsx (updated)
- *
- * Changes:
- * - Uses Framer Motion to animate stats smoothly when values change.
- * - Slower chip rotation (30s) and smoother visual behavior.
- * - Experience select replaced with styled native select + CSS to avoid white-on-white issue.
- * - When chips active, search input gets emerald outline.
- * - Stats persist in localStorage and still simulate day-based growth.
- *
- * Requirements:
- * - Install framer-motion: `npm install framer-motion`
- *
- * Paste this file as components/Hero.jsx (replacing previous).
- */
-
-/* -------------------- CONFIG -------------------- */
-const CHIP_POOL = ["React", "Node", "Frontend", "MERN", "Remote", "Vue", "Angular", "Django", "Express"];
+const CHIP_POOL = ["React", "Node", "Frontend", "MERN", "Remote", "UI/UX", "Python", "Fullstack"];
 const VISIBLE_CHIP_COUNT = 5;
-// rotate chips every 30 seconds (slower)
-const ROTATE_INTERVAL_MS = 30000;
-// live increment every 60 seconds (demo)
+const ROTATE_INTERVAL_MS = 20000;
 const LIVE_INCREMENT_INTERVAL_MS = 60000;
-// per-day growth simulation
+
 const PER_DAY_GROWTH = {
   jobs: [5, 40],
   companies: [0, 3],
   applications: [10, 150],
 };
+
 const LS_KEYS = {
   stats: "apthire_stats_v1",
   statsDate: "apthire_stats_date_v1",
   chipIndex: "apthire_chip_index_v1",
 };
 
-/* -------------------- HELPERS -------------------- */
 function randBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
 function formatCompact(n) {
   if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M+`;
   if (n >= 1000) return `${(n / 1000).toFixed(1)}k+`;
   return `${n}+`;
 }
 
-/* -------------------- AnimatedNumber (Framer) -------------------- */
-function AnimatedNumber({ value, format = (v) => v, duration = 0.9, className = "" }) {
-  const mv = useMotionValue(value);
-  const [display, setDisplay] = useState(() => Math.round(value));
+function AnimatedNumber({ value, format = (v) => v, duration = 2, className = "" }) {
+  const mv = useMotionValue(0);
+  const [display, setDisplay] = useState(0);
 
   useEffect(() => {
     const controls = animate(mv, value, {
       duration,
-      ease: [0.2, 0.8, 0.2, 1],
+      ease: [0.16, 1, 0.3, 1],
     });
     const unsub = mv.on("change", (v) => setDisplay(Math.round(v)));
     return () => {
       unsub();
       controls.stop();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   return <div className={className}>{format(display)}</div>;
 }
 
-/* -------------------- HERO -------------------- */
 export default function Hero() {
   const [query, setQuery] = useState("");
   const [experience, setExperience] = useState("any");
   const [location, setLocation] = useState("");
   const [activeTags, setActiveTags] = useState([]);
+  const [chipStartIndex, setChipStartIndex] = useState(0);
 
-  const [chipStartIndex, setChipStartIndex] = useState(() => {
-    try {
-      const saved = parseInt(localStorage.getItem(LS_KEYS.chipIndex) || "0", 10);
-      return Number.isFinite(saved) ? saved : 0;
-    } catch {
-      return 0;
-    }
+  const [stats, setStats] = useState({
+    jobs: 1240,
+    companies: 862,
+    applications: 5120,
   });
 
-  const [stats, setStats] = useState(() => ({
-    jobs: 1200,
-    companies: 850,
-    applications: 5000,
-  }));
-
   const visibleChips = useMemo(() => {
-    const pool = CHIP_POOL;
     const res = [];
     for (let i = 0; i < VISIBLE_CHIP_COUNT; i++) {
-      res.push(pool[(chipStartIndex + i) % pool.length]);
+      res.push(CHIP_POOL[(chipStartIndex + i) % CHIP_POOL.length]);
     }
     return res;
   }, [chipStartIndex]);
 
-  /* --- load saved stats + day-based growth --- */
   useEffect(() => {
     try {
-      const saved = JSON.parse(localStorage.getItem(LS_KEYS.stats) || "null");
+      const saved = JSON.parse(localStorage.getItem(LS_KEYS.stats));
       const savedDate = localStorage.getItem(LS_KEYS.statsDate);
       if (saved && savedDate) {
-        const prev = saved;
         const prevDate = new Date(savedDate);
         const now = new Date();
         const dayDiff = Math.floor((now - prevDate) / (1000 * 60 * 60 * 24));
-        let updated = { ...prev };
+        let updated = { ...saved };
         if (dayDiff > 0) {
           for (let d = 0; d < dayDiff; d++) {
             updated.jobs += randBetween(...PER_DAY_GROWTH.jobs);
@@ -119,271 +87,166 @@ export default function Hero() {
         }
         setStats(updated);
         localStorage.setItem(LS_KEYS.stats, JSON.stringify(updated));
-        localStorage.setItem(LS_KEYS.statsDate, new Date().toISOString());
+        localStorage.setItem(LS_KEYS.statsDate, now.toISOString());
       } else {
         localStorage.setItem(LS_KEYS.stats, JSON.stringify(stats));
         localStorage.setItem(LS_KEYS.statsDate, new Date().toISOString());
       }
-    } catch {
-      localStorage.setItem(LS_KEYS.stats, JSON.stringify(stats));
-      localStorage.setItem(LS_KEYS.statsDate, new Date().toISOString());
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    } catch (e) {}
   }, []);
 
-  /* --- live increments (slower, every minute) --- */
   useEffect(() => {
     const id = setInterval(() => {
-      setStats((prev) => {
-        const next = {
-          jobs: prev.jobs + randBetween(0, 3),
-          companies: prev.companies + (Math.random() < 0.02 ? 1 : 0),
-          applications: prev.applications + randBetween(1, 12),
-        };
-        localStorage.setItem(LS_KEYS.stats, JSON.stringify(next));
-        localStorage.setItem(LS_KEYS.statsDate, new Date().toISOString());
-        return next;
-      });
-    }, LIVE_INCREMENT_INTERVAL_MS);
-    return () => clearInterval(id);
-  }, []);
-
-  /* --- rotate chips (slower) --- */
-  useEffect(() => {
-    const id = setInterval(() => {
-      setChipStartIndex((i) => {
-        const next = (i + 1) % CHIP_POOL.length;
-        try {
-          localStorage.setItem(LS_KEYS.chipIndex, String(next));
-        } catch {}
-        return next;
-      });
+      setChipStartIndex((i) => (i + 1) % CHIP_POOL.length);
     }, ROTATE_INTERVAL_MS);
     return () => clearInterval(id);
   }, []);
 
-  function toggleTag(tag) {
-    setActiveTags((prev) => {
-      const next = prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag];
-      if (!prev.includes(tag)) {
-        setQuery((q) => (q ? `${q} ${tag}` : tag));
-      }
-      return next;
-    });
-  }
-
-  function onSearch(e) {
+  const onSearch = (e) => {
     e.preventDefault();
-    // Build query string for jobs page
     const params = new URLSearchParams();
     if (query) params.set('q', query);
-    if (experience && experience !== 'any') params.set('exp', experience);
+    if (experience !== 'any') params.set('exp', experience);
     if (location) params.set('loc', location);
-    
-    // Navigate to jobs page with filters
     window.location.href = `/jobs?${params.toString()}`;
-  }
+  };
+
+  const toggleTag = (tag) => {
+    setActiveTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]);
+    if (!activeTags.includes(tag)) {
+        setQuery(q => q ? `${q} ${tag}` : tag);
+    }
+  };
 
   return (
-    <section className="w-full bg-[#0d0d0d] text-white">
-      {/* small global CSS to style select/options for dark dropdown to avoid white-on-white */}
-      <style jsx global>{`
-        /* Ensure native select and options are dark in the dropdown where browser allows */
-        select.experience-select {
-          -webkit-appearance: none;
-          -moz-appearance: none;
-          appearance: none;
-          background: transparent;
-          color: #fff;
-        }
-        select.experience-select option {
-          background-color: #0d0d0d;
-          color: #fff;
-        }
-        /* small arrow replacement for select */
-        .select-wrapper {
-          position: relative;
-        }
-        .select-wrapper::after {
-          content: "";
-          position: absolute;
-          right: 10px;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 8px;
-          height: 8px;
-          border-right: 2px solid rgba(255,255,255,0.8);
-          border-bottom: 2px solid rgba(255,255,255,0.8);
-          transform: translateY(-50%) rotate(45deg);
-          pointer-events: none;
-        }
-      `}</style>
+    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-[#0d0d0d] pt-20 pb-12 sm:pt-32">
+      {/* Background elements */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.05)_0%,transparent_70%)]"></div>
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03]"></div>
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+      </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-20">
-        <div className="flex flex-col items-center text-center gap-6">
-          <div>
-            <h1 className="font-head text-3xl sm:text-4xl md:text-5xl leading-tight">
-              Find skill-first jobs — fast.
-            </h1>
-            <p className="mt-4 text-gray-300 max-w-2xl font-main mx-auto">
-              Apthire helps freshers and junior developers get hired on skills and projects — not degrees.
-              Search roles, filter by experience and location, and apply with confidence.
-            </p>
-          </div>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        
+        {/* Badge */}
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-bold mb-8 uppercase tracking-widest"
+        >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            Platform is Live
+        </motion.div>
 
-          {/* Search card centered */}
-          <form
-            onSubmit={onSearch}
-            className="w-full bg-[#111111] border border-white/6 rounded-lg p-4 shadow-sm"
-          >
-            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-center">
-              {/* Query */}
-              <div className="flex-1 min-w-0">
-                <label className="sr-only">Job title or skill</label>
-                <input
+        {/* Hero Content */}
+        <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="font-head text-4xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight tracking-tight"
+        >
+            Hire on <span className="text-emerald-500 tracking-tighter">Skills</span>,<br className="hidden sm:block" /> Not Just Degrees.
+        </motion.h1>
+
+        <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="max-w-2xl mx-auto text-gray-400 text-lg sm:text-xl mb-12 font-main leading-relaxed"
+        >
+            Apthire connects talented developers with high-growth companies. 
+            Showcase your skills, find remote roles, and build your career on projects.
+        </motion.p>
+
+        {/* Search Bar */}
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="max-w-4xl mx-auto mb-16"
+        >
+            <form 
+              onSubmit={onSearch}
+              className="glass p-2 sm:p-3 rounded-2xl shadow-2xl flex flex-col md:flex-row gap-2 items-stretch"
+            >
+              <div className="flex-grow flex items-center bg-white/5 rounded-xl border border-white/5 px-4 focus-within:border-emerald-500/50 transition-all">
+                <svg className="w-5 h-5 text-gray-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input 
+                  type="text" 
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Job title or skill (eg. React, MERN, API)"
-                  className={`w-full bg-transparent border border-white/6 rounded-md px-3 py-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 ${
-                    activeTags.length > 0 ? "focus:ring-emerald-500/60 border-emerald-500/40" : "focus:ring-emerald-500/30"
-                  } font-main text-sm`}
+                  placeholder="Job title, skills, or company..."
+                  className="w-full bg-transparent py-3 text-sm focus:outline-none placeholder:text-gray-600"
                 />
               </div>
 
-              {/* Experience - styled select */}
-              <div className="w-full md:w-36 select-wrapper">
-                <label className="sr-only">Experience</label>
-                <select
+              <div className="flex-shrink-0 md:w-48 bg-white/5 rounded-xl border border-white/5 px-4 focus-within:border-emerald-500/50 transition-all">
+                <select 
                   value={experience}
                   onChange={(e) => setExperience(e.target.value)}
-                  className="experience-select w-full border border-white/6 rounded-md px-3 py-2 font-main text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30 bg-transparent"
+                  className="w-full bg-transparent h-full py-3 text-sm focus:outline-none text-gray-400 font-main"
                 >
                   <option value="any">Experience</option>
                   <option value="0">Fresher</option>
-                  <option value="0-1">0 - 1 yr</option>
-                  <option value="1-2">1 - 2 yrs</option>
-                  <option value="2-4">2 - 4 yrs</option>
-                  <option value="2-4">4 - 6 yrs</option>
-                  <option value="2-4">6  - 8 yrs</option>
-                  <option value="2-4">10+ yrs</option>
+                  <option value="1-3">1-3 Years</option>
+                  <option value="3-5">3-5 Years</option>
+                  <option value="5+">5+ Years</option>
                 </select>
               </div>
 
-              {/* Location */}
-              <div className="w-full md:w-56">
-                <label className="sr-only">Location</label>
-                <input
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Location (eg. Delhi, Remote)"
-                  className="w-full bg-transparent border border-white/6 rounded-md px-3 py-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 font-main text-sm"
-                />
-              </div>
+              <button 
+                type="submit"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-xl transition shadow-lg shadow-emerald-500/20 active:scale-95"
+              >
+                Search
+              </button>
+            </form>
 
-              {/* Search button - fixed size and aligned */}
-              <div className="flex-shrink-0">
-                <button
-                  type="submit"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-alt text-sm transition"
-                >
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <circle cx="11" cy="11" r="6" strokeWidth="2" />
-                    <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35" />
-                  </svg>
-                  Search
-                </button>
-              </div>
-            </div>
-
-            {/* Active filters summary (centered, live) */}
-            <div className="mt-3 flex flex-wrap justify-center items-center gap-2">
-              {query && (
-                <div className="inline-flex items-center gap-2 bg-white/6 px-3 py-1 rounded text-sm font-main">
-                  <strong className="font-semibold text-white">Query:</strong>
-                  <span className="text-gray-200 truncate max-w-xs">{query}</span>
-                </div>
-              )}
-
-              {location && (
-                <div className="inline-flex items-center gap-2 bg-white/6 px-3 py-1 rounded text-sm font-main">
-                  <strong className="font-semibold text-white">Location:</strong>
-                  <span className="text-gray-200">{location}</span>
-                </div>
-              )}
-
-              {experience !== "any" && (
-                <div className="inline-flex items-center gap-2 bg-white/6 px-3 py-1 rounded text-sm font-main">
-                  <strong className="font-semibold text-white">Exp:</strong>
-                  <span className="text-gray-200">{experience}</span>
-                </div>
-              )}
-
-              {activeTags.length > 0 &&
-                activeTags.map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => toggleTag(t)}
-                    type="button"
-                    className="inline-flex items-center gap-2 bg-emerald-600 text-white px-3 py-1 rounded text-sm font-main"
-                  >
-                    {t}
-                    <span className="text-xs text-emerald-100/80">×</span>
-                  </button>
-                ))}
-
-              {(query || location || experience !== "any" || activeTags.length > 0) && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setQuery("");
-                    setLocation("");
-                    setExperience("any");
-                    setActiveTags([]);
-                  }}
-                  className="ml-1 text-sm text-gray-400 hover:text-gray-200"
-                >
-                  Clear
-                </button>
-              )}
-            </div>
-
-            {/* Quick tags (centered, rotating) */}
-            <div className="mt-3 flex justify-center flex-wrap gap-2">
-              {visibleChips.map((tag) => (
-                <button
+            <div className="flex flex-wrap justify-center items-center gap-3 mt-6">
+              <span className="text-xs text-gray-500 font-bold uppercase tracking-wider mr-2">Hot Topics:</span>
+              {visibleChips.map(tag => (
+                <button 
                   key={tag}
-                  type="button"
                   onClick={() => toggleTag(tag)}
-                  className={`px-3 py-1 rounded-md text-sm font-main transition ${
-                    activeTags.includes(tag)
-                      ? "bg-emerald-600 text-white"
-                      : "bg-white/6 text-gray-200 hover:bg-white/10"
+                  className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
+                    activeTags.includes(tag) 
+                      ? "bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-500/20" 
+                      : "bg-white/5 border-white/10 text-gray-400 hover:text-white hover:border-white/20"
                   }`}
                 >
                   {tag}
                 </button>
               ))}
             </div>
-          </form>
+        </motion.div>
 
-          {/* Stats centered and animated */}
-          <div className="mt-8 flex flex-wrap justify-center gap-8 text-center">
-            <div className="min-w-[90px]">
-              <AnimatedNumber value={stats.jobs} format={formatCompact} className="font-head text-2xl sm:text-3xl text-white" />
-              <div className="text-sm font-main text-gray-300">Jobs live</div>
+        {/* Stats Section */}
+        <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="grid grid-cols-2 sm:grid-cols-3 gap-8 max-w-3xl mx-auto border-t border-white/5 pt-12"
+        >
+            <div>
+                <AnimatedNumber value={stats.jobs} format={formatCompact} className="text-3xl sm:text-4xl font-head font-bold text-white mb-2" />
+                <p className="text-sm text-gray-500 font-bold uppercase tracking-widest">Jobs Live</p>
             </div>
+            <div>
+                <AnimatedNumber value={stats.companies} format={formatCompact} className="text-3xl sm:text-4xl font-head font-bold text-white mb-2" />
+                <p className="text-sm text-gray-500 font-bold uppercase tracking-widest">Companies</p>
+            </div>
+            <div className="col-span-2 sm:col-span-1">
+                <AnimatedNumber value={stats.applications} format={formatCompact} className="text-3xl sm:text-4xl font-head font-bold text-white mb-2" />
+                <p className="text-sm text-gray-500 font-bold uppercase tracking-widest">Applications</p>
+            </div>
+        </motion.div>
 
-            <div className="min-w-[90px]">
-              <AnimatedNumber value={stats.companies} format={formatCompact} className="font-head text-2xl sm:text-3xl text-white" />
-              <div className="text-sm font-main text-gray-300">Companies</div>
-            </div>
-
-            <div className="min-w-[90px]">
-              <AnimatedNumber value={stats.applications} format={formatCompact} className="font-head text-2xl sm:text-3xl text-white" />
-              <div className="text-sm font-main text-gray-300">Applications</div>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );

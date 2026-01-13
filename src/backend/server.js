@@ -5,12 +5,14 @@ require("dotenv").config({
 
 const express = require("express");
 const cors = require("cors");
+const passport = require("passport");
 const connectDB = require("./config/db");
 
 // Routes
 const userRoutes = require("./routes/userRoutes");
 const jobRoutes = require("./routes/jobRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
@@ -25,6 +27,9 @@ app.use(
 // Middleware
 app.use(express.json());
 
+// Initialize Passport
+app.use(passport.initialize());
+
 // DB
 connectDB();
 
@@ -33,6 +38,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/applications", require("./routes/applicationRoutes"));
 app.use("/api/admin", dashboardRoutes);
+app.use("/api/auth", authRoutes); // Google OAuth routes
 
 // Port
 const PORT = process.env.PORT || 5001;

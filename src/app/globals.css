@@ -1,49 +1,78 @@
-/* ============================
-   Google Fonts
-   ============================ */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Karla:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700;800&display=swap');
-
-/* ============================
-   Tailwind Base
-   ============================ */
 @import "tailwindcss";
 
-/* ============================
-   Theme Variables
-   ============================ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0d0d0d;
+  --foreground: #ffffff;
+  
+  --font-main: var(--font-inter), sans-serif;
+  --font-head: var(--font-outfit), sans-serif;
+  --font-alt: var(--font-inter), sans-serif;
 
-  --font-main: 'Inter', sans-serif;
-  --font-alt: 'Karla', sans-serif;
-  --font-head: 'Montserrat', sans-serif;
+  /* Custom Emerald Palette */
+  --emerald-primary: #10b981;
+  --emerald-secondary: #059669;
+  --emerald-dark: #064e3b;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-/* ============================
-   Global Styles
-   ============================ */
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-main);
-  margin: 0;
-  padding: 0;
 }
 
-/* Font utility classes */
+.font-head { font-family: var(--font-head); }
 .font-main { font-family: var(--font-main); }
 .font-alt { font-family: var(--font-alt); }
-.font-head { font-family: var(--font-head); }
 
-/* Smooth UI */
-html {
-  scroll-behavior: smooth;
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #111;
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+
+/* Glassmorphism Utilities */
+.glass {
+  background: rgba(17, 17, 17, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-2px);
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Hide Scrollbar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

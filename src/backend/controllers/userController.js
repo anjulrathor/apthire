@@ -12,7 +12,8 @@ const generateToken = (id) => {
 // Hardcoded Admin Whitelist
 const ADMIN_EMAILS = [
     "admin@apthire.com",
-    "ceo@apthire.com"
+    "ceo@apthire.com",
+    "anjulrathor.dev@gmail.com"
 ];
 
 // @desc    Register new user

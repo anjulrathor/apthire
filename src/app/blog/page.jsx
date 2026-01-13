@@ -39,11 +39,12 @@ export default function BlogPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl sm:text-6xl font-head font-bold text-white mb-6">
-            Insights & <span className="text-emerald-500">Stories</span>
+          <h1 className="text-5xl md:text-7xl font-head font-black text-white mb-6 tracking-[-0.04em] leading-tight">
+            Insights & <br />
+            <span className="bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500 bg-clip-text text-transparent">Stories</span>
           </h1>
           <p className="text-gray-400 max-w-2xl mx-auto text-lg font-main">
-            Latest trends in recruitment, engineering culture, and career growth for the modern developer.
+            Latest trends in remote recruitment, engineering culture, and career growth for the modern Indian developer.
           </p>
         </div>
 

@@ -64,9 +64,11 @@ export default function JobsList() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Page Header */}
-        <div className="mb-12">
-            <h1 className="text-3xl sm:text-4xl font-head font-bold text-white mb-2">Available Opportunities</h1>
-            <p className="text-gray-400">Find the perfect role that matches your skills.</p>
+        <div className="mb-16">
+            <h1 className="text-4xl sm:text-6xl font-head font-black text-white mb-4 tracking-[-0.04em] leading-tight">
+              Available <span className="bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">Opportunities</span>
+            </h1>
+            <p className="text-gray-400 text-lg font-main max-w-2xl">Find the perfect role that matches your skills in the global startup ecosystem.</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">

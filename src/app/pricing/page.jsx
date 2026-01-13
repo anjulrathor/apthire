@@ -54,13 +54,13 @@ export default function PricingPage() {
     <main className="min-h-screen bg-[#0d0d0d] pt-28 pb-20 px-4 font-main">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-20 animate-in fade-in slide-in-from-top-4 duration-700">
-          <h1 className="text-4xl sm:text-6xl font-head font-bold text-white mb-6">
+        <div className="text-center mb-20">
+          <h1 className="text-5xl sm:text-7xl font-head font-black text-white mb-6 tracking-[-0.04em] leading-tight">
             Simple, Transparent <br />
-            <span className="text-emerald-500">Pricing</span>
+            <span className="bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500 bg-clip-text text-transparent">Pricing</span>
           </h1>
-          <p className="text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed">
-            Choose the plan that fits your growth. Whether you're a candidate looking for a dream job or a recruiter building a dream team.
+          <p className="text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed font-main">
+            Choose the plan that fits your growth. Whether you're a candidate looking for an overseas dream job or a recruiter building a global team.
           </p>
         </div>
 

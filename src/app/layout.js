@@ -1,7 +1,6 @@
 import { Outfit, Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
+import NavigationManager from "@/components/layout/NavigationManager";
 import { AuthProvider } from "@/context/AuthContext";
 import { ToastProvider } from "@/context/ToastContext";
 import LoginPrompt from "@/components/ui/LoginPrompt";
@@ -38,14 +37,10 @@ export default function RootLayout({ children }) {
       >
         <AuthProvider>
           <ToastProvider>
-            <div className="flex flex-col min-h-screen">
-              <Navbar />  
-              <main className="flex-grow">
-                {children}
-              </main>
-              <Footer />
-              <LoginPrompt />
-            </div>
+            <NavigationManager>
+              {children}
+            </NavigationManager>
+            <LoginPrompt />
           </ToastProvider>
         </AuthProvider>
       </body>

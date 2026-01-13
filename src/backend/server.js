@@ -39,6 +39,7 @@ app.use("/api/jobs", jobRoutes);
 app.use("/api/applications", require("./routes/applicationRoutes"));
 app.use("/api/admin", dashboardRoutes);
 app.use("/api/auth", authRoutes); // Google OAuth routes
+app.use("/api/leads", require("./routes/leadRoutes"));
 
 // Port
 const PORT = process.env.PORT || 5001;

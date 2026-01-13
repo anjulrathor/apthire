@@ -1,8 +1,11 @@
 import React from "react";
 import Link from "next/link";
 import Logo from "../ui/Logo";
+import { Linkedin } from "lucide-react";
 
 export default function Footer() {
+  const LINKEDIN = "https://www.linkedin.com/in/anjulrathor/";
+
   return (
     <footer className="bg-[#0a0a0a] text-gray-400 py-12 border-t border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -15,14 +18,15 @@ export default function Footer() {
               Empowering Indian tech talent to secure high-paying overseas roles. Bridge the gap between India and the global startup ecosystem.
             </p>
             <div className="flex space-x-4">
-              {['twitter', 'github', 'linkedin'].map(social => (
-                <a key={social} href="#" className="hover:text-emerald-500 transition-colors">
-                  <span className="sr-only">{social}</span>
-                  <div className="w-5 h-5 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">
-                     {/* Dynamic Icon placeholder or SVGs can go here */}
-                  </div>
-                </a>
-              ))}
+              <a 
+                href={LINKEDIN} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-all text-gray-400"
+              >
+                <span className="sr-only">LinkedIn</span>
+                <Linkedin className="w-5 h-5" />
+              </a>
             </div>
           </div>
 
@@ -46,6 +50,7 @@ export default function Footer() {
               <li><Link href="/contact" className="hover:text-emerald-400 transition-colors">Contact</Link></li>
               <li><Link href="/careers" className="hover:text-emerald-400 transition-colors">Careers</Link></li>
               <li><Link href="/blog" className="hover:text-emerald-400 transition-colors">Blog</Link></li>
+              <li><Link href="https://www.anjulrathor.com/" className="hover:text-emerald-400 transition-colors">Meet the Developer</Link></li>
             </ul>
           </div>
 

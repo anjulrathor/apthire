@@ -29,9 +29,10 @@ export default function AboutPage() {
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="font-head text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight"
+            className="font-head text-5xl md:text-7xl font-black text-white mb-6 tracking-[-0.04em] leading-tight"
           >
-            Our Mission is <span className="text-emerald-500">Global</span>.
+            Our Mission is <br />
+            <span className="bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500 bg-clip-text text-transparent">Borderless</span> Talent.
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}

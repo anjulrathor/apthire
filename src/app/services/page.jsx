@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { motion } from "framer-motion";
 import { CheckCircle2, Zap, Target, Users, BarChart3, ShieldCheck } from "lucide-react";
 
 export default function ServicesPage() {
@@ -40,14 +41,20 @@ export default function ServicesPage() {
     <main className="min-h-screen bg-[#0d0d0d] pt-28 pb-20 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Hero Section */}
-        <div className="text-center mb-20">
-          <h2 className="text-emerald-500 font-bold tracking-widest uppercase text-sm mb-4">Our Services</h2>
-          <h1 className="text-4xl sm:text-6xl font-head font-bold text-white mb-6">
+        <div className="text-center mb-24">
+          <motion.h2 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-emerald-500 font-bold tracking-[0.2em] uppercase text-[10px] mb-6"
+          >
+            Capabilities & Ecosystem
+          </motion.h2>
+          <h1 className="text-5xl sm:text-7xl font-head font-black text-white mb-8 tracking-[-0.04em] leading-[1.1]">
             Everything you need to <br />
-            <span className="bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">Hire or get Hired</span>
+            <span className="bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500 bg-clip-text text-transparent">Hire or get Hired</span>
           </h1>
           <p className="text-gray-400 max-w-2xl mx-auto text-lg font-main leading-relaxed">
-            We provide specialized services designed to eliminate the friction in modern recruitment, focusing on verified skills and real-world performance.
+            We provide specialized services designed to eliminate the friction in modern recruitment, focusing on verified skills and real-world performance for Indian talent and global startups.
           </p>
         </div>
 

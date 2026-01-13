@@ -42,7 +42,7 @@ export default function PrivacyPage() {
           <h3 className="text-white font-bold mb-2">Contact Us</h3>
           <p className="text-gray-400 text-sm">
             If you have questions about this Privacy Policy, please contact our data protection team at 
-            <span className="text-emerald-500 ml-1">privacy@apthire.com</span>
+            <span className="text-emerald-500 ml-1">anjulrathor.dev@gmail.com</span>
           </p>
         </div>
       </div>

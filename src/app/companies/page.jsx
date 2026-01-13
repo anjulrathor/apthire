@@ -77,12 +77,12 @@ export default function CompaniesPage() {
     <main className="min-h-screen bg-[#0d0d0d] pt-28 pb-20 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-4xl sm:text-5xl font-head font-bold text-white mb-4">
-            Explore <span className="text-emerald-500">Companies</span>
+        <div className="mb-16">
+          <h1 className="text-4xl sm:text-6xl font-head font-black text-white mb-6 tracking-[-0.04em] leading-tight">
+            Explore <span className="bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">Companies</span>
           </h1>
-          <p className="text-gray-400 max-w-2xl font-main">
-            Discover your next employer from our curated list of world-class companies hiring top talent through skill-first evaluation.
+          <p className="text-gray-400 text-lg max-w-2xl font-main">
+            Discover your next employer from our curated list of world-class startups hiring top talent through skill-first evaluation.
           </p>
         </div>
 

@@ -14,14 +14,14 @@ export default function CareersPage() {
     <main className="min-h-screen bg-[#0d0d0d] pt-28 pb-20 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Hero */}
-        <div className="text-center mb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <h2 className="text-emerald-500 font-bold tracking-widest uppercase text-sm mb-4">Join our team</h2>
-          <h1 className="text-4xl sm:text-6xl font-head font-bold text-white mb-6">
-            Help us build the <br />
-            <span className="bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">Future of Hiring</span>
+        <div className="text-center mb-20">
+          <h2 className="text-emerald-500 font-bold tracking-[0.2em] uppercase text-[10px] mb-6">Join our team</h2>
+          <h1 className="text-5xl sm:text-7xl font-head font-black text-white mb-8 tracking-[-0.04em] leading-[1.1]">
+            Build the <br />
+            <span className="bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500 bg-clip-text text-transparent">Future of Hiring</span>
           </h1>
           <p className="text-gray-400 max-w-2xl mx-auto text-lg font-main leading-relaxed">
-            We're a small, mission-driven team dedicated to making skill-based hiring the new global standard. We're always looking for passionate people to join us.
+            We're a mission-driven team dedicated to making skill-based hiring the new global standard for the next generation of Indian talent.
           </p>
         </div>
 
@@ -70,7 +70,7 @@ export default function CareersPage() {
           </div>
           
           <div className="mt-12 text-center text-gray-500 text-sm">
-            Don't see a fit? Send us an open application at <span className="text-emerald-500 font-bold">careers@apthire.com</span>
+            Don't see a fit? Send us an open application at <span className="text-emerald-500 font-bold">anjulrathor.dev@gmail.com</span>
           </div>
         </div>
       </div>

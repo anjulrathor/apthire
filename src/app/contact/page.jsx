@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Linkedin, Mail, MapPin, ArrowRight } from "lucide-react";
 
-const EMAIL = "hello@apthire.com";
-const WEBSITE = "https://apthire.com";
-const LINKEDIN = "https://www.linkedin.com/company/apthire";
+const EMAIL = "anjulrathor.dev@gmail.com";
+const LINKEDIN = "https://www.linkedin.com/in/anjulrathor/";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
 
 export default function ContactPage() {
   const [name, setName] = useState("");
@@ -34,13 +35,22 @@ export default function ContactPage() {
 
     setLoading(true);
     try {
-      await new Promise((r) => setTimeout(r, 1200));
+      const res = await fetch(`${API_BASE_URL}/api/leads`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, message }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message || "Failed to send message");
+
       setStatus("ok");
       setName("");
       setEmail("");
       setMessage("");
     } catch (err) {
-      setErrorMsg("Something went wrong. Please try again.");
+      setErrorMsg(err.message || "Something went wrong. Please try again.");
       setStatus("error");
     } finally {
       setLoading(false);
@@ -81,23 +91,38 @@ export default function ContactPage() {
             className="lg:col-span-4 space-y-6"
           >
             <div className="glass p-8 rounded-3xl space-y-8">
-                <div>
-                   <h3 className="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-4">Email Us</h3>
-                   <a href={`mailto:${EMAIL}`} className="text-xl font-bold text-white hover:text-emerald-400 transition-colors">{EMAIL}</a>
+                <div className="flex items-start gap-4">
+                   <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
+                      <Mail className="w-5 h-5" />
+                   </div>
+                   <div>
+                      <h3 className="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-1">Email Us</h3>
+                      <a href={`mailto:${EMAIL}`} className="text-lg font-bold text-white hover:text-emerald-400 transition-colors break-words">{EMAIL}</a>
+                   </div>
                 </div>
-                <div>
-                   <h3 className="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-4">Location</h3>
-                   <p className="text-xl font-bold text-white leading-tight">Remote-First Team<br /><span className="text-sm font-normal text-gray-400">HQ: Lucknow, India</span></p>
+                
+                <div className="flex items-start gap-4">
+                   <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
+                      <MapPin className="w-5 h-5" />
+                   </div>
+                   <div>
+                      <h3 className="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-1">Location</h3>
+                      <p className="text-lg font-bold text-white leading-tight">Remote-First Team<br /><span className="text-sm font-normal text-gray-400">HQ: Noida, UP</span></p>
+                   </div>
                 </div>
-                <div>
-                   <h3 className="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-4">Follow Us</h3>
-                   <div className="flex gap-4">
-                      {['twitter', 'linkedin', 'github'].map(social => (
-                        <a key={social} href="#" className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-all text-gray-400">
-                           <span className="sr-only">{social}</span>
-                           <div className="w-5 h-5 bg-current rounded-sm"></div>
+
+                <div className="flex items-start gap-4">
+                   <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
+                      <Linkedin className="w-5 h-5" />
+                   </div>
+                   <div>
+                      <h3 className="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-4">Follow Us</h3>
+                      <div className="flex gap-4">
+                        <a href={LINKEDIN} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-all text-gray-400 group">
+                           <span className="sr-only">LinkedIn</span>
+                           <Linkedin className="w-5 h-5 group-hover:scale-110 transition-transform" />
                         </a>
-                      ))}
+                      </div>
                    </div>
                 </div>
             </div>
@@ -107,7 +132,7 @@ export default function ContactPage() {
                 <p className="text-emerald-500/80 text-sm mb-4">Check our frequently asked questions for quick answers.</p>
                 <a href="/faq" className="text-white text-sm font-bold flex items-center gap-2 hover:gap-3 transition-all">
                     Visit Support Center 
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    <ArrowRight className="w-4 h-4" />
                 </a>
             </div>
           </motion.div>
@@ -128,7 +153,7 @@ export default function ContactPage() {
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder="John Doe"
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all font-main"
                         />
                     </div>
                     <div className="space-y-2">
@@ -138,7 +163,7 @@ export default function ContactPage() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="john@example.com"
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all font-main"
                         />
                     </div>
                 </div>
@@ -150,12 +175,12 @@ export default function ContactPage() {
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         placeholder="Tell us more about your inquiry..."
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all resize-none"
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all resize-none font-main"
                     />
                 </div>
 
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                    <p className="text-xs text-gray-600 max-w-xs">By submitting this form, you agree to our privacy policy and terms of service.</p>
+                    <p className="text-xs text-gray-600 max-w-xs font-main">By submitting this form, you agree to our privacy policy and terms of service.</p>
                     <button 
                         type="submit"
                         disabled={loading}

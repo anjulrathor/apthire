@@ -1,9 +1,9 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
-export default function GoogleCallbackPage() {
+function CallbackContent() {
   const searchParams = useSearchParams();
   const { login } = useAuth();
 
@@ -27,11 +27,24 @@ export default function GoogleCallbackPage() {
   }, [searchParams, login]);
 
   return (
+    <div className="text-center">
+      <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500 mb-4"></div>
+      <p className="text-gray-400">Completing sign in...</p>
+    </div>
+  );
+}
+
+export default function GoogleCallbackPage() {
+  return (
     <main className="min-h-screen bg-[#0d0d0d] text-white flex items-center justify-center">
-      <div className="text-center">
-        <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500 mb-4"></div>
-        <p className="text-gray-400">Completing sign in...</p>
-      </div>
+      <Suspense fallback={
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500 mb-4"></div>
+          <p className="text-gray-400">Loading...</p>
+        </div>
+      }>
+        <CallbackContent />
+      </Suspense>
     </main>
   );
 }

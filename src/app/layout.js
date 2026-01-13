@@ -21,7 +21,11 @@ export const metadata = {
   title: "Apthire | Skill-First Hiring Platform",
   description: "Simple, skill-first hiring for freshers and startups. Find jobs based on your skills and projects, not just degrees.",
   keywords: "jobs, hiring, freshers, startups, skill-first, recruitment, apthire",
-  viewport: "width=device-width, initial-scale=1",
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
   themeColor: "#0d0d0d",
 };
 

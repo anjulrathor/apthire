@@ -87,6 +87,7 @@ const loginUser = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        profile: user.profile,
         token: generateToken(user._id),
       });
     } else {
@@ -166,14 +167,23 @@ const updateUserProfile = async (req, res) => {
     const user = await User.findById(req.user.id);
 
     if (user) {
-      user.name = req.body.name || user.name;
-      
-      // Update nested profile fields if provided
+      const updates = {
+         name: req.body.name || user.name
+      };
+
       if (req.body.profile) {
-        user.profile = { ...user.profile, ...req.body.profile };
+        for (const [key, value] of Object.entries(req.body.profile)) {
+           if (value !== undefined) {
+              updates[`profile.${key}`] = value;
+           }
+        }
       }
 
-      const updatedUser = await user.save();
+      const updatedUser = await User.findByIdAndUpdate(
+        req.user.id,
+        { $set: updates },
+        { new: true, runValidators: false }
+      );
 
       res.json({
         success: true,

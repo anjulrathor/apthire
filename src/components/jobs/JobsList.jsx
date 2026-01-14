@@ -24,7 +24,14 @@ export default function JobsList() {
   const [selectedJob, setSelectedJob] = useState(null);
   const [applying, setApplying] = useState(false);
   const [coverNote, setCoverNote] = useState("");
+  const [resumeUrl, setResumeUrl] = useState("");
   const { success, error: toastError } = useToast();
+
+  useEffect(() => {
+    if (user?.profile?.resumeUrl) {
+        setResumeUrl(user.profile.resumeUrl);
+    }
+  }, [user]);
 
   useEffect(() => {
     const qParam = searchParams.get('q');
@@ -248,6 +255,16 @@ export default function JobsList() {
                                     placeholder="Briefly explain why you're a good fit..."
                                 />
                             </div>
+
+                            <div className="space-y-2">
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest">Resume URL <span className="text-red-500">*</span></label>
+                                <input 
+                                    value={resumeUrl}
+                                    onChange={(e) => setResumeUrl(e.target.value)}
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all placeholder:text-gray-700"
+                                    placeholder="https://drive.google.com/..."
+                                />
+                            </div>
                         </div>
                    </div>
 
@@ -256,15 +273,19 @@ export default function JobsList() {
                           disabled={applying}
                           onClick={async () => {
                               if(!user) return window.location.href = '/login';
-                              setApplying(true);
-                              try {
-                                  const res = await fetch(`${API_BASE_URL}/api/applications`, {
-                                      method: "POST",
-                                      headers: {
-                                          "Content-Type": "application/json",
-                                          "Authorization": `Bearer ${localStorage.getItem("token")}`
-                                      },
-                                      body: JSON.stringify({ jobId: selectedJob._id, coverNote })
+                                  if(!resumeUrl) {
+                                    toastError("Please provide a resume URL");
+                                    return;
+                                  }
+                                  setApplying(true);
+                                  try {
+                                      const res = await fetch(`${API_BASE_URL}/api/applications`, {
+                                          method: "POST",
+                                          headers: {
+                                              "Content-Type": "application/json",
+                                              "Authorization": `Bearer ${localStorage.getItem("token")}`
+                                          },
+                                          body: JSON.stringify({ jobId: selectedJob._id, coverNote, resumeUrl })
                                   });
                                   const data = await res.json();
                                   if(!res.ok) throw new Error(data.message);

@@ -15,8 +15,20 @@ function CallbackContent() {
       try {
         const userData = JSON.parse(decodeURIComponent(userParam));
         
-        // Store token and user data, then redirect based on role
+        // Store token and user data
         login(userData, token);
+
+        // Redirect logic based on profile completion
+        if (userData.role === 'candidate' && userData.isProfileComplete === false) {
+           setTimeout(() => {
+             window.location.href = "/profile/create";
+           }, 100);
+           return;
+        }
+        // Normal redirects are handled by AuthContext but we can safety net here if needed,
+        // though AuthContext.login usually handles the redirect. 
+        // We rely on AuthContext for standard redirects, but if we need to force profile creation:
+        
       } catch (error) {
         console.error("Error parsing user data:", error);
         window.location.href = "/login?error=invalid_callback";

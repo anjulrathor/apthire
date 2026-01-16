@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
+
 
 export default function AdminJobsPage() {
   const { user, loading } = useAuth();
@@ -12,14 +12,32 @@ export default function AdminJobsPage() {
   
   useEffect(() => {
     async function fetchJobs() {
-        const res = await fetch(`${API_BASE_URL}/api/jobs`);
+        const res = await fetch(`/api/jobs`);
         const data = await res.json();
         if (data.success) {
-            setJobs(data.jobs); // Note: Current controller returns { count, jobs: [] }
+            setJobs(data.jobs);
         }
     }
     fetchJobs();
   }, []);
+
+  const handleDelete = async (id) => {
+    if (!confirm("Are you sure you want to delete this job?")) return;
+    try {
+      const res = await fetch(`/api/jobs/${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        setJobs(jobs.filter((j) => j._id !== id));
+      } else {
+        alert("Failed to delete job");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Error deleting job");
+    }
+  };
 
   if (loading) return null;
 
@@ -53,8 +71,7 @@ export default function AdminJobsPage() {
                   {new Date(job.createdAt).toLocaleDateString()}
                 </td>
                 <td className="p-4 text-right space-x-2">
-                  <button className="text-blue-400 hover:underline text-sm">Edit</button>
-                  <button className="text-red-400 hover:underline text-sm">Close</button>
+                  <button onClick={() => handleDelete(job._id)} className="text-red-400 hover:text-red-300 transition-colors text-sm">Delete</button>
                 </td>
               </tr>
             ))}

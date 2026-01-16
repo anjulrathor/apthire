@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { X, Sparkles } from "lucide-react";
+import { X } from "lucide-react";
 
 export default function LoginPrompt() {
   const { user, loading } = useAuth();
@@ -60,9 +60,7 @@ export default function LoginPrompt() {
         </button>
 
         <div className="flex items-center gap-2 mb-4">
-          <div className="p-2 bg-emerald-500/20 rounded-lg">
-            <Sparkles className="w-5 h-5 text-emerald-500" />
-          </div>
+
           <h4 className="font-bold text-white font-head">Ready to start?</h4>
         </div>
 

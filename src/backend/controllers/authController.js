@@ -55,20 +55,13 @@ passport.use(
           }
         } else {
           console.log("Creating new user:", email);
-          // New user - create account
-          let role = null; // Default to null for role selection
-
-          // Check if email is in admin whitelist
-          if (ADMIN_EMAILS.includes(email.toLowerCase())) {
-            role = "admin";
-          }
-
+          // New user - create account as CANDIDATE by default
           user = await User.create({
             name,
             email,
+            image: profile.photos?.[0]?.value || "",
             googleId,
-            role,
-            // No password for Google OAuth users
+            role: "candidate", // ENFORCE CANDIDATE ROLE FOR GOOGLE LOGIN
           });
           console.log("New user created:", user._id);
         }
@@ -136,23 +129,19 @@ const googleCallback = (req, res, next) => {
     const token = generateToken(user._id);
 
     // Prepare user data
+    // Prepare user data
     const userData = {
       _id: user._id,
       name: user.name,
       email: user.email,
       role: user.role,
+      image: user.image,
+      isProfileComplete: user.role === 'candidate' ? !!user.profile?.headline : true // Simple check
     };
 
     console.log("Redirecting user with role:", user.role);
 
-    // Redirect to frontend with token and user data
-    if (!user.role) {
-      return res.redirect(
-        `${frontendUrl}/select-role?token=${token}&user=${encodeURIComponent(JSON.stringify(userData))}`
-      );
-    }
-
-    // If role is set, redirect to callback handler
+    // Direct redirect to callback
     return res.redirect(
       `${frontendUrl}/auth/google/callback?token=${token}&user=${encodeURIComponent(JSON.stringify(userData))}`
     );

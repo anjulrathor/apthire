@@ -2,16 +2,16 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { Briefcase, FileText, CheckCircle, Clock } from "lucide-react";
+import { Briefcase, FileText, CheckCircle, Clock, Menu, X } from "lucide-react";
 import Link from "next/link";
-
-
+import LogoutButton from "@/components/ui/LogoutButton";
 
 export default function RecruiterDashboard() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [stats, setStats] = useState({ jobs: 0, applications: 0, hired: 0, pending: 0 });
   const [fetching, setFetching] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'recruiter')) {
@@ -49,28 +49,55 @@ export default function RecruiterDashboard() {
   if (loading || fetching || !user) return <div className="min-h-screen bg-[#0d0d0d] text-white flex items-center justify-center">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-[#0d0d0d] text-white flex">
+    <div className="min-h-screen bg-[#0d0d0d] text-white flex flex-col md:flex-row">
+      {/* Mobile Header/Toggle */}
+      <div className="md:hidden p-4 border-b border-white/10 flex justify-between items-center bg-[#0d0d0d] sticky top-0 z-40">
+           <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold">R</div>
+                <span className="font-bold">Recruiter</span>
+           </div>
+           <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 text-gray-400 hover:text-white">
+               {isSidebarOpen ? <X /> : <Menu />}
+           </button>
+      </div>
+
+      {/* Mobile Overlay */}
+      {isSidebarOpen && (
+        <div 
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 border-r border-white/10 p-6 hidden md:block">
-        <div className="flex items-center gap-2 mb-8">
+      <aside className={`
+          fixed md:sticky top-0 left-0 h-screen w-64 bg-[#0d0d0d] border-r border-white/10 p-6 z-50 
+          transform transition-transform duration-300 ease-in-out
+          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0
+      `}>
+        <div className="flex items-center gap-2 mb-8 hidden md:flex">
             <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold">R</div>
             <h2 className="text-xl font-bold font-head">Recruiter</h2>
         </div>
         <nav className="space-y-2">
-            <Link href="/recruiter" className="block px-4 py-2 rounded bg-emerald-600/10 text-emerald-400 font-medium">Dashboard</Link>
-            <Link href="/recruiter/jobs" className="block px-4 py-2 rounded hover:bg-white/5 text-gray-400 hover:text-white transition">My Jobs</Link>
-            <Link href="/recruiter/applications" className="block px-4 py-2 rounded hover:bg-white/5 text-gray-400 hover:text-white transition">Applications</Link>
+            <Link href="/recruiter" onClick={() => setIsSidebarOpen(false)} className="block px-4 py-2 rounded bg-emerald-600/10 text-emerald-400 font-medium">Dashboard</Link>
+            <Link href="/recruiter/jobs" onClick={() => setIsSidebarOpen(false)} className="block px-4 py-2 rounded hover:bg-white/5 text-gray-400 hover:text-white transition">My Jobs</Link>
+            <Link href="/recruiter/applications" onClick={() => setIsSidebarOpen(false)} className="block px-4 py-2 rounded hover:bg-white/5 text-gray-400 hover:text-white transition">Applications</Link>
+            <Link href="/profile" onClick={() => setIsSidebarOpen(false)} className="block px-4 py-2 rounded hover:bg-white/5 text-gray-400 hover:text-white transition">Settings</Link>
+            <div className="pt-4 mt-4 border-t border-white/10">
+              <LogoutButton className="w-full justify-start" showText={true} label="Log Out" />
+            </div>
         </nav>
       </aside>
 
       {/* Main */}
-      <main className="flex-1 p-8">
-          <header className="flex justify-between items-center mb-8">
+      <main className="flex-1 p-4 md:p-8 overflow-y-auto">
+          <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
               <div>
                   <h1 className="text-2xl font-bold">Hello, {user.name}</h1>
                   <p className="text-gray-400 text-sm">Manage your hiring pipeline.</p>
               </div>
-              <Link href="/recruiter/jobs/new" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md font-bold text-sm">
+              <Link href="/recruiter/jobs/new" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md font-bold text-sm w-full md:w-auto text-center">
                   + Post New Job
               </Link>
           </header>

@@ -92,7 +92,31 @@ export default function NewJobPage() {
                     </div>
                     <div>
                         <label className="block text-sm font-bold text-gray-400 mb-2">Salary</label>
-                        <input name="salary" required onChange={handleChange} className="w-full bg-[#0d0d0d] border border-white/10 rounded px-3 py-2 outline-none focus:border-emerald-500" placeholder="e.g. ₹15-25 LPA" />
+                        <div className="flex gap-2">
+                             <select 
+                                name="currency" 
+                                className="w-20 bg-[#0d0d0d] border border-white/10 rounded px-2 py-2 outline-none focus:border-emerald-500 text-sm"
+                                onChange={(e) => {
+                                    const currentVal = formData.salary.replace(/^[^\s]+\s/, '');
+                                    setFormData(prev => ({...prev, salary: `${e.target.value} ${currentVal}`}));
+                                }}
+                             >
+                                 <option value="₹">₹ (INR)</option>
+                                 <option value="$">$ (USD)</option>
+                                 <option value="€">€ (EUR)</option>
+                                 <option value="£">£ (GBP)</option>
+                             </select>
+                             <input 
+                                name="salary_amount" 
+                                required 
+                                onChange={(e) => {
+                                    const currency = formData.salary.split(' ')[0] || '₹';
+                                    setFormData(prev => ({...prev, salary: `${currency} ${e.target.value}`}));
+                                }}
+                                className="w-full bg-[#0d0d0d] border border-white/10 rounded px-3 py-2 outline-none focus:border-emerald-500" 
+                                placeholder="e.g. 15-25 LPA" 
+                             />
+                        </div>
                     </div>
                 </div>
 

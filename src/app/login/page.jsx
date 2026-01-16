@@ -29,13 +29,23 @@ export default function LoginPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Login failed");
+      
+      if (!res.ok) {
+        // Check if email is not verified
+        if (data.isVerified === false) {
+          toastError("Email not verified. Redirecting to verification...");
+          setTimeout(() => {
+            window.location.href = `/signup?email=${encodeURIComponent(email)}&verify=true`;
+          }, 1500);
+          return;
+        }
+        throw new Error(data?.message || "Login failed");
+      }
 
       // Successful login
       success("Welcome back! Redirecting...");
       
       if (data?.token) {
-        // Use the context login function to handle state and redirects
         login({
             _id: data._id,
             name: data.name,

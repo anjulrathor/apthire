@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from 'recharts';
 import { Users, Briefcase, FileText, CheckCircle } from "lucide-react";
+import LogoutButton from "@/components/ui/LogoutButton";
 
 export default function AdminDashboard() {
   const { user, loading } = useAuth();
@@ -55,6 +56,7 @@ export default function AdminDashboard() {
         <div className="flex items-center gap-3">
           <span className="text-sm text-gray-400 font-main">{user.email}</span>
           <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold font-head">A</div>
+          <LogoutButton showText={false} className="bg-white/5 border border-white/10" />
         </div>
       </header>
 

@@ -27,6 +27,13 @@ export default function ProfilePage() {
     experienceLevel: "fresher"
   });
 
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: ""
+  });
+  const [changingPassword, setChangingPassword] = useState(false);
+
   useEffect(() => {
     if (!user) {
         if (!loading) router.push("/login");
@@ -71,6 +78,11 @@ export default function ProfilePage() {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
+  
+  const handlePasswordChangeInput = (e) => {
+    const { name, value } = e.target;
+    setPasswordData(prev => ({ ...prev, [name]: value }));
+  };
 
   const calculateCompleteness = () => {
       let score = 0;
@@ -88,6 +100,7 @@ export default function ProfilePage() {
     e.preventDefault();
     setSaving(true);
     
+    // Format data for backend
     const payload = {
        name: formData.name,
        profile: {
@@ -120,6 +133,39 @@ export default function ProfilePage() {
         toastError(err.message);
     } finally {
         setSaving(false);
+    }
+  };
+
+  const handlePasswordUpdate = async (e) => {
+    e.preventDefault();
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+        toastError("New passwords do not match");
+        return;
+    }
+    
+    setChangingPassword(true);
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/users/password`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+            },
+            body: JSON.stringify({
+                currentPassword: passwordData.currentPassword,
+                newPassword: passwordData.newPassword
+            })
+        });
+        
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Failed to update password");
+        
+        success("Password updated successfully");
+        setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+    } catch (err) {
+        toastError(err.message);
+    } finally {
+        setChangingPassword(false);
     }
   };
 
@@ -200,12 +246,13 @@ export default function ProfilePage() {
                 </div>
             </motion.aside>
 
-            {/* Form Section */}
+            {/* Main Forms */}
             <motion.div 
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="lg:col-span-8"
+                className="lg:col-span-8 space-y-8"
             >
+                {/* Profile Edit Form */}
                 <div className="glass p-8 md:p-12 rounded-[40px]">
                     <h1 className="text-3xl font-head font-bold text-white mb-12">Edit Profile</h1>
                     
@@ -309,6 +356,60 @@ export default function ProfilePage() {
                             >
                                 {saving ? "Syncing Profile..." : "Update Settings"}
                             </button>
+                        </div>
+                    </form>
+                </div>
+
+                {/* Password Change Form */}
+                <div className="glass p-8 md:p-12 rounded-[40px]">
+                    <h2 className="text-2xl font-head font-bold text-white mb-8">Security Settings</h2>
+                    
+                    <form onSubmit={handlePasswordUpdate} className="space-y-8">
+                        <div className="space-y-2">
+                             <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Current Password</label>
+                             <input 
+                                 type="password"
+                                 name="currentPassword"
+                                 value={passwordData.currentPassword}
+                                 onChange={handlePasswordChangeInput}
+                                 placeholder="••••••••"
+                                 className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all font-main"
+                             />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                             <div className="space-y-2">
+                                 <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">New Password</label>
+                                 <input 
+                                     type="password"
+                                     name="newPassword"
+                                     value={passwordData.newPassword}
+                                     onChange={handlePasswordChangeInput}
+                                     placeholder="••••••••"
+                                     className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all font-main"
+                                 />
+                             </div>
+                             <div className="space-y-2">
+                                 <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Confirm New Password</label>
+                                 <input 
+                                     type="password"
+                                     name="confirmPassword"
+                                     value={passwordData.confirmPassword}
+                                     onChange={handlePasswordChangeInput}
+                                     placeholder="••••••••"
+                                     className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all font-main"
+                                 />
+                             </div>
+                        </div>
+
+                        <div className="flex justify-end pt-6 border-t border-white/5">
+                             <button 
+                                 type="submit"
+                                 disabled={changingPassword || !passwordData.newPassword}
+                                 className="w-full md:w-auto bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-4 px-12 rounded-2xl transition disabled:opacity-50"
+                             >
+                                 {changingPassword ? "Updating..." : "Update Password"}
+                             </button>
                         </div>
                     </form>
                 </div>

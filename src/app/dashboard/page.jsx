@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Avatar from "@/components/ui/Avatar";
+import LogoutButton from "@/components/ui/LogoutButton";
 
 export default function DashboardPage() {
   const { user, loading } = useAuth();
@@ -33,6 +34,10 @@ export default function DashboardPage() {
               <p className="text-gray-400 mt-1 font-main">
                 Welcome back, <span className="text-white font-medium">{user.name}</span>!
               </p>
+              </p>
+          </div>
+          <div className="ml-auto">
+            <LogoutButton />
           </div>
         </header>
 

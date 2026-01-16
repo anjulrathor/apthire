@@ -150,12 +150,11 @@ export default function Hero() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="font-head text-5xl sm:text-7xl lg:text-8xl font-black text-white mb-8 leading-[1.1] tracking-[-0.04em]"
         >
-            Land <span className="relative inline-block">
-              <span className="bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500 bg-clip-text text-transparent">Overseas</span>
+            Jobs that <span className="relative inline-block">
+              <span className="bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500 bg-clip-text text-transparent">match you.</span>
               <span className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-emerald-500/0 via-emerald-500/50 to-emerald-500/0 rounded-full"></span>
-            </span> Jobs,<br className="hidden sm:block" /> 
-            <span className="text-white/40 italic font-light text-3xl sm:text-5xl">Directly from</span> 
-            <span className="ml-3 inline-block bg-white/5 border border-white/10 px-4 py-1 rounded-2xl text-white text-3xl sm:text-5xl align-middle transform -rotate-1">India.</span>
+            </span><br className="hidden sm:block" /> 
+            <span className="text-white/40 italic font-light text-3xl sm:text-5xl">Nothing else.</span>
         </motion.h1>
 
         <motion.p 
@@ -164,8 +163,7 @@ export default function Hero() {
             transition={{ delay: 0.2 }}
             className="max-w-2xl mx-auto text-gray-400 text-lg sm:text-xl mb-12 font-main leading-relaxed"
         >
-            Apthire connects India's top tech talent with high-growth startups in the US, Europe, and UAE. 
-            Skip the visa hassle—work remotely for global teams based on your skills.
+            Apthire shows you only the jobs you're meant for — based on your skills, experience, and goals. No clutter. No spam.
         </motion.p>
 
         {/* Search Bar */}
@@ -210,7 +208,7 @@ export default function Hero() {
                 type="submit"
                 className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-xl transition shadow-lg shadow-emerald-500/20 active:scale-95"
               >
-                Search
+                Find my matched jobs
               </button>
             </form>
 

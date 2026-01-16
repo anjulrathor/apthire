@@ -43,7 +43,13 @@ export default function JobsList() {
   useEffect(() => {
     async function fetchJobs() {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/jobs`);
+        // Build API URL with userId for smart matching
+        let url = `${API_BASE_URL}/api/jobs`;
+        if (user?._id) {
+          url += `?userId=${user._id}`;
+        }
+        
+        const res = await fetch(url);
         const data = await res.json();
         const jobList = Array.isArray(data) ? data : (data.jobs || []);
         setJobs(jobList);
@@ -54,7 +60,7 @@ export default function JobsList() {
       }
     }
     fetchJobs();
-  }, []);
+  }, [user]);
 
   const filtered = useMemo(() => {
     if(!jobs) return [];
@@ -73,9 +79,9 @@ export default function JobsList() {
         {/* Page Header */}
         <div className="mb-16">
             <h1 className="text-4xl sm:text-6xl font-head font-black text-white mb-4 tracking-[-0.04em] leading-tight">
-              Available <span className="bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">Opportunities</span>
+              Jobs that <span className="bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">match you</span>
             </h1>
-            <p className="text-gray-400 text-lg font-main max-w-2xl">Find the perfect role that matches your skills in the global startup ecosystem.</p>
+            <p className="text-gray-400 text-lg font-main max-w-2xl">Only the right jobs. No clutter. No noise. We show you opportunities aligned with your skills and experience.</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -133,17 +139,29 @@ export default function JobsList() {
                 <div className="text-center py-20 glass rounded-2xl border-dashed border-2 border-white/10">
                     <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                         </svg>
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-2">No jobs matched your search</h3>
-                    <p className="text-gray-400 mb-6">Try adjusting your filters or search query.</p>
-                    <button onClick={() => {setQ(""); setLocationFilter(""); setSkillFilter("");}} className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-xl transition font-bold">Clear all filters</button>
+                    <h3 className="text-xl font-bold text-white mb-2">No jobs match your profile right now</h3>
+                    <p className="text-gray-400 mb-6 max-w-md mx-auto">We'll notify you when a relevant job is posted. Update your skills and preferences to see more matches.</p>
+                    {user && (
+                        <a href="/profile" className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-xl transition font-bold">
+                            Update Profile
+                        </a>
+                    )}
                 </div>
             ) : (
                 <div className="grid gap-6 sm:grid-cols-2">
                   <AnimatePresence mode="popLayout">
-                    {filtered.slice(0, visible).map((job, index) => (
+                    {filtered.slice(0, visible).map((job, index) => {
+                      // Figure out how long ago this job was posted
+                      const postedDate = new Date(job.createdAt);
+                      const now = new Date();
+                      const diffTime = Math.abs(now - postedDate);
+                      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                      const timeString = diffDays <= 1 ? "New" : `Posted ${diffDays} days ago`;
+
+                      return (
                       <motion.div 
                         layout
                         initial={{ opacity: 0, scale: 0.95 }}
@@ -158,7 +176,7 @@ export default function JobsList() {
                                 <div className="p-2 bg-emerald-500/10 rounded-lg text-emerald-500 font-bold text-xs uppercase tracking-widest border border-emerald-500/20">
                                     {job.type || "Full-time"}
                                 </div>
-                                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">Posted 2 days ago</span>
+                                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">{timeString}</span>
                             </div>
                             
                             <h3 className="text-xl font-bold text-white mb-1 group-hover:text-emerald-500 transition-colors">{job.title}</h3>
@@ -181,15 +199,31 @@ export default function JobsList() {
                             <div className="text-sm text-white font-bold">
                                 {job.salary || "Competitive"}
                             </div>
-                            <button 
-                                onClick={() => setSelectedJob(job)}
-                                className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all shadow-lg shadow-emerald-500/20 active:scale-95"
-                            >
-                                Fast Apply
-                            </button>
+                            <div className="flex gap-2">
+                                <button 
+                                    onClick={() => {
+                                        setSelectedJob(job);
+                                        // We'll reuse the modal but maybe add a "View Mode" later. 
+                                        // For now, opening the modal IS viewing the details.
+                                    }}
+                                    className="bg-white/5 hover:bg-white/10 text-white text-xs font-bold px-3 py-2 rounded-lg transition-all border border-white/10 active:scale-95"
+                                >
+                                    View Details
+                                </button>
+                                <button 
+                                    onClick={() => setSelectedJob(job)}
+                                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all shadow-lg shadow-emerald-500/20 active:scale-95 flex items-center gap-1.5"
+                                >
+                                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
+                                    </svg>
+                                    Fast Apply
+                                </button>
+                            </div>
                         </div>
                       </motion.div>
-                    ))}
+                      );
+                    })}
                   </AnimatePresence>
                 </div>
             )}
@@ -208,7 +242,7 @@ export default function JobsList() {
         </div>
       </div>
 
-      {/* Apply Modal */}
+      {/* Job Details & Apply Modal */}
       <AnimatePresence>
         {selectedJob && (
             <motion.div 
@@ -216,97 +250,151 @@ export default function JobsList() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+                onClick={(e) => {
+                    if(e.target === e.currentTarget) setSelectedJob(null);
+                }}
             >
                <motion.div 
                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
                  animate={{ opacity: 1, scale: 1, y: 0 }}
                  exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                 className="bg-[#111] border border-white/10 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl"
+                 className="bg-[#111] border border-white/10 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col"
                >
-                   <div className="p-8 pb-4 relative">
+                   <div className="p-8 pb-4 relative flex-shrink-0">
                         <button 
                             onClick={() => setSelectedJob(null)} 
                             className="absolute top-6 right-6 p-2 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 transition"
                         >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
-                        <h2 className="text-2xl font-bold font-head text-white mb-1">Apply for {selectedJob.title}</h2>
-                        <p className="text-emerald-500 text-sm font-bold mb-8">at {selectedJob.company}</p>
                         
-                        <div className="space-y-6">
-                            <div className="glass p-4 rounded-xl border-emerald-500/20">
-                                <p className="text-xs text-gray-500 font-bold uppercase mb-2">Authenticated as</p>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold">{user?.name?.charAt(0) || "U"}</div>
-                                    <div>
-                                        <p className="text-sm font-bold text-white">{user?.name || "Guest User"}</p>
-                                        <p className="text-xs text-gray-500">{user?.email}</p>
-                                    </div>
-                                </div>
+                        <div className="mb-6">
+                            <h2 className="text-3xl font-bold font-head text-white mb-2">{selectedJob.title}</h2>
+                            <div className="flex flex-wrap items-center gap-3">
+                                <span className="text-emerald-500 font-bold text-lg">{selectedJob.company}</span>
+                                <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                                <span className="text-gray-400 text-sm">{selectedJob.location}</span>
+                                <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                                <span className="text-white text-sm font-bold bg-white/10 px-2 py-0.5 rounded">{selectedJob.type}</span>
                             </div>
-                            
-                            <div className="space-y-2">
-                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest">Cover Note (Optional)</label>
-                                <textarea 
-                                    rows={4}
-                                    value={coverNote}
-                                    onChange={(e) => setCoverNote(e.target.value)}
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all placeholder:text-gray-700"
-                                    placeholder="Briefly explain why you're a good fit..."
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest">Resume URL <span className="text-red-500">*</span></label>
-                                <input 
-                                    value={resumeUrl}
-                                    onChange={(e) => setResumeUrl(e.target.value)}
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all placeholder:text-gray-700"
-                                    placeholder="https://drive.google.com/..."
-                                />
+                            <div className="mt-4 text-xl font-bold text-white">
+                                {selectedJob.salary || "Competitive Salary"}
                             </div>
                         </div>
-                   </div>
 
-                   <div className="p-8 pt-4">
-                        <button
-                          disabled={applying}
-                          onClick={async () => {
-                              if(!user) return window.location.href = '/login';
-                                  if(!resumeUrl) {
-                                    toastError("Please provide a resume URL");
-                                    return;
-                                  }
-                                  setApplying(true);
-                                  try {
-                                      const res = await fetch(`${API_BASE_URL}/api/applications`, {
-                                          method: "POST",
-                                          headers: {
-                                              "Content-Type": "application/json",
-                                              "Authorization": `Bearer ${localStorage.getItem("token")}`
-                                          },
-                                          body: JSON.stringify({ jobId: selectedJob._id, coverNote, resumeUrl })
-                                  });
-                                  const data = await res.json();
-                                  if(!res.ok) throw new Error(data.message);
-                                  success("Application submitted successfully!");
-                                  setSelectedJob(null);
-                              } catch(err) {
-                                  toastError(err.message || "Something went wrong. Please try again.");
-                              } finally {
-                                  setApplying(false);
-                              }
-                          }}
-                          className="w-full py-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition shadow-lg shadow-emerald-500/20 disabled:opacity-50 active:scale-[0.98]"
-                        >
-                            {applying ? (
-                                <span className="flex items-center justify-center gap-2">
-                                    <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                    Processing...
-                                </span>
-                            ) : "Confirm Application"}
-                        </button>
-                        <p className="mt-4 text-center text-[10px] text-gray-600 uppercase tracking-tighter">Your profile and resume will be shared with the recruiter.</p>
+                        {/* Job Details Section */}
+                        <div className="space-y-6 mb-8 border-b border-white/10 pb-8">
+                            <div>
+                                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3">Description</h3>
+                                <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">{selectedJob.description}</p>
+                            </div>
+                            
+                            {selectedJob.requirements && (
+                                <div>
+                                    <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3">Requirements</h3>
+                                    <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">{selectedJob.requirements}</p>
+                                </div>
+                            )}
+
+                            <div>
+                                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3">Skills</h3>
+                                <div className="flex flex-wrap gap-2">
+                                    {selectedJob.skills.map(skill => (
+                                        <span key={skill} className="text-xs px-2 py-1 bg-white/5 rounded-md text-gray-300 border border-white/5">{skill}</span>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Application Section */}
+                        {!user ? (
+                            <div className="glass p-6 rounded-xl border-emerald-500/20 text-center">
+                                <h3 className="text-lg font-bold text-white mb-2">Want to apply?</h3>
+                                <p className="text-gray-400 mb-4">Please sign in to apply for this position.</p>
+                                <button 
+                                    onClick={() => window.location.href = `/login?redirect=/jobs`}
+                                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-xl transition shadow-lg shadow-emerald-500/20 active:scale-95"
+                                >
+                                    Sign In to Apply
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="space-y-6 bg-white/5 p-6 rounded-xl">
+                                <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                                    <svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                    Fast Application
+                                </h3>
+                                
+                                <div className="glass p-4 rounded-xl border-emerald-500/20 mb-4">
+                                    <p className="text-xs text-gray-500 font-bold uppercase mb-2">Applying as</p>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold">{user.name?.charAt(0) || "U"}</div>
+                                        <div>
+                                            <p className="text-sm font-bold text-white">{user.name}</p>
+                                            <p className="text-xs text-gray-500">{user.email}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div className="space-y-2">
+                                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest">Cover Note (Optional)</label>
+                                    <textarea 
+                                        rows={3}
+                                        value={coverNote}
+                                        onChange={(e) => setCoverNote(e.target.value)}
+                                        className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all placeholder:text-gray-700"
+                                        placeholder="Briefly explain why you're a good fit..."
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest">Resume URL <span className="text-red-500">*</span></label>
+                                    <input 
+                                        value={resumeUrl}
+                                        onChange={(e) => setResumeUrl(e.target.value)}
+                                        className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all placeholder:text-gray-700"
+                                        placeholder="https://drive.google.com/..."
+                                    />
+                                </div>
+
+                                <button
+                                  disabled={applying}
+                                  onClick={async () => {
+                                          if(!resumeUrl) {
+                                            toastError("Please provide a resume URL");
+                                            return;
+                                          }
+                                          setApplying(true);
+                                          try {
+                                              const res = await fetch(`${API_BASE_URL}/api/applications`, {
+                                                  method: "POST",
+                                                  headers: {
+                                                      "Content-Type": "application/json",
+                                                      "Authorization": `Bearer ${localStorage.getItem("token")}`
+                                                  },
+                                                  body: JSON.stringify({ jobId: selectedJob._id, coverNote, resumeUrl })
+                                          });
+                                          const data = await res.json();
+                                          if(!res.ok) throw new Error(data.message);
+                                          success("Application submitted successfully!");
+                                          setSelectedJob(null);
+                                      } catch(err) {
+                                          toastError(err.message || "Something went wrong. Please try again.");
+                                      } finally {
+                                          setApplying(false);
+                                      }
+                                  }}
+                                  className="w-full py-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition shadow-lg shadow-emerald-500/20 disabled:opacity-50 active:scale-[0.98]"
+                                >
+                                    {applying ? (
+                                        <span className="flex items-center justify-center gap-2">
+                                            <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                            Processing...
+                                        </span>
+                                    ) : "Submit Application"}
+                                </button>
+                            </div>
+                        )}
                    </div>
                </motion.div>
             </motion.div>

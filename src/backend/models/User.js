@@ -35,6 +35,18 @@ const userSchema = new mongoose.Schema(
       enum: ["candidate", "recruiter", "admin"],
       default: "candidate",
     },
+
+    // OTP Verification
+    otp: {
+      type: String,
+    },
+    otpExpiresAt: {
+      type: Date,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
     
     // Naukri-style Profile Data
     profile: {

@@ -18,9 +18,9 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "Apthire | Remote Overseas Jobs for Indian Talent",
-  description: "Land high-paying tech jobs in the US, Europe, and UAE directly from India. Skill-based hiring for global startups.",
-  keywords: "remote jobs india, overseas software jobs, US tech jobs from india, Apthire, skill-based hiring, international remote work",
+  title: "Apthire | Jobs That Match You. Nothing Else.",
+  description: "Smart matching for your next big role. We filter out the noise and show you only the jobs that match your skills and experience. Fast apply, zero clutter.",
+  keywords: "smart job matching, skill based hiring, tech jobs india, remote work, Apthire, personalized job feed",
 };
 
 export const viewport = {

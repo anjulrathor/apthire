@@ -72,7 +72,7 @@ export default function NewJobPage() {
                     </div>
                     <div>
                         <label className="block text-sm font-bold text-gray-400 mb-2">Company Name</label>
-                        <input name="company" required onChange={handleChange} className="w-full bg-[#0d0d0d] border border-white/10 rounded px-3 py-2 outline-none focus:border-emerald-500" placeholder="e.g. Google" />
+                        <input name="company" required onChange={handleChange} className="w-full bg-[#0d0d0d] border border-white/10 rounded px-3 py-2 outline-none focus:border-emerald-500" placeholder="e.g. Apthire Innovations" />
                     </div>
                 </div>
 

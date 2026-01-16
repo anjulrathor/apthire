@@ -18,7 +18,18 @@ Go to your Dashboard -> Select Backend Service -> Environment Variables -> Add E
 
 ---
 
-## 2. Vercel (Frontend) Settings
+## 2. Render Settings (Crucial!)
+Go to **Settings** tab on the left.
+
+| Setting | Value | Notes |
+|---------|-------|-------|
+| **Root Directory** | `.` (Leave empty) | **IMPORTANT:** Do NOT put 'src' or 'backend' here. |
+| **Build Command** | `npm install` | installs packages |
+| **Start Command** | `npm run backend` | starts the server correctly |
+
+---
+
+## 3. Vercel (Frontend) Settings
 Go to your Project -> Settings -> Environment Variables
 
 | Variable Name | Value to Add | Notes |

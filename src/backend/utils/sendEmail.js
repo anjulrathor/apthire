@@ -7,6 +7,9 @@ const sendEmail = async (options) => {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
+    // Add timeouts to prevent hanging
+    connectionTimeout: 10000, 
+    socketTimeout: 10000 
   });
 
   const message = {
@@ -16,7 +19,9 @@ const sendEmail = async (options) => {
     html: options.html,
   };
 
-  await transporter.sendMail(message);
+  console.log(`Attempting to send email to: ${options.to}`);
+  const info = await transporter.sendMail(message);
+  console.log(`Email sent: ${info.messageId}`);
 };
 
 module.exports = sendEmail;

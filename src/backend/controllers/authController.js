@@ -4,6 +4,14 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { ADMIN_EMAILS } = require("./userController");
 
+// Safety Checks
+if (!process.env.GOOGLE_CALLBACK_URL) {
+  console.warn("⚠️ WARNING: GOOGLE_CALLBACK_URL is not defined in environment variables. Google OAuth will not work.");
+}
+if (!process.env.FRONTEND_URL) {
+  console.warn("⚠️ WARNING: FRONTEND_URL is not defined in environment variables. Post-login redirects will not work.");
+}
+
 // Generate JWT
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET || "default_secret_change_me", {
@@ -17,8 +25,8 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.GOOGLE_CALLBACK_URL || "http://localhost:5001/api/auth/google/callback",
-      passReqToCallback: true, // Allow us to see the request for dynamic URL detection
+      callbackURL: process.env.GOOGLE_CALLBACK_URL,
+      passReqToCallback: true,
     },
     async (req, accessToken, refreshToken, profile, done) => {
       try {
@@ -93,14 +101,8 @@ passport.deserializeUser(async (id, done) => {
 // @route   GET /api/auth/google
 // @access  Public
 const googleAuth = (req, res, next) => {
-  const isLocal = req.get('host').includes('localhost');
-  const callbackURL = isLocal 
-    ? (process.env.GOOGLE_CALLBACK_URL || "http://localhost:5001/api/auth/google/callback")
-    : (process.env.PROD_GOOGLE_CALLBACK_URL || "https://apthire.vercel.app/api/auth/google/callback");
-
   passport.authenticate("google", {
     scope: ["profile", "email"],
-    callbackURL: callbackURL,
   })(req, res, next);
 };
 
@@ -108,10 +110,12 @@ const googleAuth = (req, res, next) => {
 // @route   GET /api/auth/google/callback
 // @access  Public
 const googleCallback = (req, res, next) => {
-  const isLocal = req.get('host').includes('localhost');
-  const frontendUrl = isLocal 
-    ? (process.env.FRONTEND_URL || 'http://localhost:3000')
-    : (process.env.PROD_FRONTEND_URL || 'https://apthire.vercel.app');
+  const frontendUrl = process.env.FRONTEND_URL;
+
+  if (!frontendUrl) {
+    console.error("❌ ERROR: FRONTEND_URL is missing. Cannot redirect.");
+    return res.status(500).send("Server Configuration Error");
+  }
 
   passport.authenticate("google", { session: false }, (err, user, info) => {
     console.log("Google callback handler called");

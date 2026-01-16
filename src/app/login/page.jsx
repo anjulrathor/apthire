@@ -21,8 +21,9 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
-      const res = await fetch(`${API_BASE_URL}/api/users/login`, {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -51,8 +52,7 @@ export default function LoginPage() {
   }
 
   function handleGoogleLogin() {
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
-    window.location.href = `${API_BASE_URL}/api/auth/google`;
+    window.location.href = `/api/auth/google`;
   }
 
   return (

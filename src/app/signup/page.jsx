@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useToast } from "@/context/ToastContext";
 import Logo from "@/components/ui/Logo";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
+
 
 export default function SignUpPage() {
   const { error: toastError, success } = useToast();
@@ -34,8 +34,9 @@ export default function SignUpPage() {
 
     setLoading(true);
     try {
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
-      const res = await fetch(`${API_BASE_URL}/api/users/register`, {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/users/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -75,8 +76,7 @@ export default function SignUpPage() {
   }
 
   function handleGoogleSignup() {
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
-    window.location.href = `${API_BASE_URL}/api/auth/google`;
+    window.location.href = `/api/auth/google`;
   }
 
   return (

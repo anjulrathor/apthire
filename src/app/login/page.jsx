@@ -91,7 +91,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-[#0d0d0d] border border-white/10 rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all"
-                placeholder="anjul@apthire.com"
+                placeholder="Enter your email"
                 type="email"
               />
             </div>

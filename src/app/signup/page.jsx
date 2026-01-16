@@ -58,9 +58,17 @@ export default function SignUpPage() {
       toastError("Password must be at least 6 characters.");
       return;
     }
+
+    // Password Complexity Check
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+    if (!passwordRegex.test(password)) {
+        toastError("Password must contain uppercase, lowercase, number & special char.");
+        return;
+    }
+
     if (password !== confirm) {
         toastError("Passwords do not match.");
-      return;
+        return;
     }
 
     setLoading(true);
@@ -229,7 +237,7 @@ export default function SignUpPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full bg-[#0d0d0d] border border-white/10 rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all"
-                    placeholder="Anjul Rathor"
+                    placeholder="Full Name"
                   />
                 </div>
 
@@ -241,7 +249,7 @@ export default function SignUpPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full bg-[#0d0d0d] border border-white/10 rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all"
-                    placeholder="anjul@apthire.com"
+                    placeholder="Enter your email"
                     type="email"
                   />
                 </div>

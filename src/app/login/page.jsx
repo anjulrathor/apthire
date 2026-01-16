@@ -151,6 +151,11 @@ export default function LoginPage() {
             </svg>
             Continue with Google
           </button>
+          <div className="text-center mt-2">
+            <span className="text-[10px] uppercase tracking-wider text-emerald-500/80 font-bold bg-emerald-500/10 px-2 py-1 rounded-full border border-emerald-500/20">
+              Candidates Only
+            </span>
+          </div>
 
           {/* Footer */}
           <div className="mt-6 text-center text-sm text-gray-400">

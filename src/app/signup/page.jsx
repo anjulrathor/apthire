@@ -34,8 +34,7 @@ export default function SignUpPage() {
 
     setLoading(true);
     try {
-    setLoading(true);
-    try {
+
       const res = await fetch(`/api/users/register`, {
         method: "POST",
         headers: {

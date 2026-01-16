@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Briefcase, FileText, CheckCircle, Clock } from "lucide-react";
 import Link from "next/link";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
+
 
 export default function RecruiterDashboard() {
   const { user, loading } = useAuth();
@@ -23,7 +23,7 @@ export default function RecruiterDashboard() {
         const fetchStats = async () => {
             try {
                 const token = localStorage.getItem("token");
-                const res = await fetch(`${API_BASE_URL}/api/admin/stats`, {
+                const res = await fetch(`/api/admin/stats`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 const data = await res.json();

@@ -28,9 +28,8 @@ export default function AdminDashboard() {
     if (user?.role === 'admin') {
         const fetchStats = async () => {
             try {
-                const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
                 const token = localStorage.getItem("token");
-                const res = await fetch(`${API_BASE_URL}/api/admin/stats`, {
+                const res = await fetch(`/api/admin/stats`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 const data = await res.json();

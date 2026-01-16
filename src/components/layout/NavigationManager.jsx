@@ -5,9 +5,12 @@ import Footer from "./Footer";
 
 export default function NavigationManager({ children }) {
   const pathname = usePathname();
-  const isAdminPath = pathname?.startsWith("/admin");
+  const isDashboardPath = 
+    pathname?.startsWith("/admin") || 
+    pathname?.startsWith("/recruiter") || 
+    pathname?.startsWith("/dashboard");
 
-  if (isAdminPath) {
+  if (isDashboardPath) {
     return <>{children}</>;
   }
 

@@ -24,6 +24,7 @@ const ADMIN_EMAILS = [
 // @access  Public
 const registerUser = async (req, res) => {
   try {
+    console.log(`[DEBUG] Register request for: ${req.body.email}`);
     const { name, email, password, role } = req.body;
 
     // First check if this guy already signed up

@@ -27,6 +27,7 @@ passport.use(
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: process.env.GOOGLE_CALLBACK_URL,
       passReqToCallback: true,
+      proxy: true, // Important for Render/Vercel proxies
     },
     async (req, accessToken, refreshToken, profile, done) => {
       try {
@@ -115,7 +116,8 @@ const googleCallback = (req, res, next) => {
     
     if (err) {
       console.error("Authentication error:", err);
-      return res.redirect(`${frontendUrl}/login?error=authentication_failed`);
+      // Pass the specific error message to frontend for easier debugging
+      return res.redirect(`${frontendUrl}/login?error=authentication_failed&message=${encodeURIComponent(err.message)}`);
     }
 
     if (!user) {

@@ -34,7 +34,7 @@ export default function DashboardPage() {
               <p className="text-gray-400 mt-1 font-main">
                 Welcome back, <span className="text-white font-medium">{user.name}</span>!
               </p>
-              </p>
+
           </div>
           <div className="ml-auto">
             <LogoutButton />

@@ -1,7 +1,8 @@
 const path = require("path");
-require("dotenv").config({
-  path: path.join(__dirname, ".env"),
-});
+// Try to load .env from current directory, but don't fail if it's missing (Render/Vercel handles it)
+require("dotenv").config();
+// Fallback to specific path only if root .env didn't have what we need
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 
 const express = require("express");
 const cors = require("cors");
@@ -21,7 +22,7 @@ const allowedOrigins = [
   "https://apthire.vercel.app",
   "https://www.apthire.vercel.app",
   process.env.FRONTEND_URL
-];
+].filter(Boolean); // Remove undefined values
 
 app.use(
   cors({
@@ -29,10 +30,15 @@ app.use(
       // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
       
-      if (allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
+      const isAllowed = allowedOrigins.includes(origin) || 
+                       origin.endsWith(".vercel.app") ||
+                       (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL);
+
+      if (isAllowed) {
         callback(null, true);
       } else {
         console.log("Blocked by CORS:", origin);
+        console.log("Allowed Origins:", allowedOrigins);
         callback(new Error("Not allowed by CORS"));
       }
     },

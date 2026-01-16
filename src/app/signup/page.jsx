@@ -75,7 +75,7 @@ export default function SignUpPage() {
 
     setLoading(true);
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 45000); // Increased to 45s for Render cold starts (Free Tier)
 
     try {
       const res = await fetch(`/api/users/register`, {
@@ -107,10 +107,11 @@ export default function SignUpPage() {
       setStep(2);
       setTimeLeft(300);
     } catch (err) {
+        console.error("Signup error:", err);
         if (err.name === 'AbortError') {
-            toastError("Server timeout. Please try again or check your internet.");
+            toastError("Server timeout. This usually happens if the backend is waking up. Please try again in a few seconds.");
         } else {
-            toastError(err.message || "Something went wrong.");
+            toastError(err.message || "Signup failed. Check console for details.");
         }
     } finally {
       clearTimeout(timeoutId);

@@ -19,9 +19,18 @@ const sendEmail = async (options) => {
     html: options.html,
   };
 
-  console.log(`Attempting to send email to: ${options.to}`);
-  const info = await transporter.sendMail(message);
-  console.log(`Email sent: ${info.messageId}`);
+  console.log(`[MAILER] Preparing to send email to: ${options.to}`);
+  console.log(`[MAILER] Using Email: ${process.env.EMAIL_USER}`);
+  
+  try {
+    const info = await transporter.sendMail(message);
+    console.log(`[MAILER] SUCCESS: Email sent! ID: ${info.messageId}`);
+    return info;
+  } catch (error) {
+    console.error(`[MAILER] ERROR: Failed to send email to ${options.to}`);
+    console.error(`[MAILER] DETAILS:`, error.message);
+    throw error; // Re-throw to be handled by controller
+  }
 };
 
 module.exports = sendEmail;

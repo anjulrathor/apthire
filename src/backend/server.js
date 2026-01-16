@@ -16,10 +16,26 @@ const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
-// ✅ ENABLE CORS (THIS FIXES FAILED TO FETCH)
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://apthire.vercel.app",
+  "https://www.apthire.vercel.app",
+  process.env.FRONTEND_URL
+];
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
+        callback(null, true);
+      } else {
+        console.log("Blocked by CORS:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );

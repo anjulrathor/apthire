@@ -64,14 +64,20 @@ export default function SignUpPage() {
     }
 
     setLoading(true);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+
     try {
       const res = await fetch(`/api/users/register`, {
+        signal: controller.signal,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ name, email, password, role }),
       });
+
+      clearTimeout(timeoutId);
 
       let data;
       const contentType = res.headers.get("content-type");
@@ -91,8 +97,13 @@ export default function SignUpPage() {
       setStep(2);
       setTimeLeft(300);
     } catch (err) {
-        toastError(err.message || "Something went wrong.");
+        if (err.name === 'AbortError') {
+            toastError("Server timeout. Please try again or check your internet.");
+        } else {
+            toastError(err.message || "Something went wrong.");
+        }
     } finally {
+      clearTimeout(timeoutId);
       setLoading(false);
     }
   }

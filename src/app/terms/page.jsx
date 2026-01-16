@@ -60,7 +60,7 @@ export default function TermsPage() {
 
           <h2 className="text-2xl font-bold text-white font-head mt-8">9. Contact</h2>
           <p>
-            For any legal notices or questions regarding these terms, please contact: origin2000s@gmail.com
+            For any legal notices or questions regarding these terms, please contact: anjulrathor.dev@gmail.com
           </p>
         </section>
       </div>

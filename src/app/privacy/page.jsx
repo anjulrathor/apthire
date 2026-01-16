@@ -77,7 +77,7 @@ export default function PrivacyPolicyPage() {
 
           <h2 className="text-2xl font-bold text-white font-head mt-8">8. Contact Us</h2>
           <p>
-            If you have any questions about this Privacy Policy, please contact us at: origin2000s@gmail.com
+            If you have any questions about this Privacy Policy, please contact us at: anjulrathor.dev@gmail.com
           </p>
         </section>
       </div>

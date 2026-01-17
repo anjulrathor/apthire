@@ -20,7 +20,7 @@ import {
 import { useState } from 'react';
 import Logo from '../ui/Logo';
 import LogoutButton from '../ui/LogoutButton';
-
+// sidebar
 export default function AdminSidebar() {
   const pathname = usePathname();
   const { user } = useAuth();

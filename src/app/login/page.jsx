@@ -73,7 +73,7 @@ export default function LoginPage() {
           <div className="flex justify-center mb-6">
             <Logo size="lg" />
           </div>
-          <h1 className="font-head text-3xl sm:text-4xl mb-3 bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">
+          <h1 className="font-head text-3xl sm:text-4xl mb-3 bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent pb-1">
             Welcome Back
           </h1>
           <p className="text-sm sm:text-base text-gray-400 font-main">

@@ -49,7 +49,7 @@ export default function HelpCenterPage() {
               <ul className="space-y-4">
                 {cat.links.map((link, j) => (
                   <li key={j}>
-                    <Link href="#" className="flex items-center justify-between text-gray-400 hover:text-emerald-400 transition-colors group">
+                    <Link href={`/help/${link.toLowerCase().replace(/ /g, "-")}`} className="flex items-center justify-between text-gray-400 hover:text-emerald-400 transition-colors group">
                       <span className="font-main italic">"{link}"</span>
                       <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-all">
                         →

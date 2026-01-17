@@ -8,12 +8,12 @@ const express = require("express");
 const cors = require("cors");
 const passport = require("passport");
 const connectDB = require("./config/db");
-
 // Routes
 const userRoutes = require("./routes/userRoutes");
 const jobRoutes = require("./routes/jobRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const authRoutes = require("./routes/authRoutes");
+const sendEmail = require("./utils/sendEmail");
 
 const app = express();
 
@@ -54,6 +54,26 @@ app.use(passport.initialize());
 
 // DB
 connectDB();
+
+// Test Route
+app.get("/api/test-email", async (req, res) => {
+    try {
+        console.log("Testing email...");
+        const result = await sendEmail({
+             to: process.env.EMAIL_FROM || "apthire.care@gmail.com", 
+             subject: "Brevo API Test",
+             html: "<h1>It Works!</h1><p>Brevo HTTP API is connected.</p>"
+        });
+        res.json({ success: true, result });
+    } catch (error) {
+        console.error("Test Email Failed:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: error.message,
+            response: error.response?.data 
+        });
+    }
+});
 
 // Routes
 app.use("/api/users", userRoutes);

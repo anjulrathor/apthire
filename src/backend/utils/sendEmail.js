@@ -1,40 +1,54 @@
-const nodemailer = require("nodemailer");
+const axios = require("axios");
 
 const sendEmail = async (options) => {
-  // Configure Brevo SMTP transport
-  const port = parseInt(process.env.BREVO_SMTP_PORT);
-  const transporter = nodemailer.createTransport({
-    host: process.env.BREVO_SMTP_HOST,
-    port: port,
-    secure: port === 465, // True for 465, false for other ports
-    auth: {
-      user: process.env.BREVO_SMTP_USER,
-      pass: process.env.BREVO_SMTP_PASS,
-    },
-    // Add timeouts to prevent hanging
-    connectionTimeout: 20000, 
-    socketTimeout: 20000 
-  });
+  // Use Brevo API instead of SMTP to avoid port blocking/timeouts
+  const apiKey = process.env.BREVO_API_KEY;
+  
+  if (!apiKey) {
+    console.error("[MAILER] FATAL: BREVO_API_KEY is missing in .env");
+    throw new Error("Email configuration error: API Key missing");
+  }
 
-  const message = {
-    from: `"Apthire Security" <${process.env.EMAIL_FROM}>`,
-    to: options.to,
+  const emailData = {
+    sender: {
+      name: "Apthire Security",
+      email: process.env.EMAIL_FROM || "apthire.care@gmail.com",
+    },
+    to: [{ email: options.to }],
     subject: options.subject,
-    html: options.html,
+    htmlContent: options.html,
   };
 
-  console.log(`[MAILER] Using Brevo SMTP`);
-  console.log(`[MAILER] Preparing to send email to: ${options.to}`);
-  console.log(`[MAILER] From: ${process.env.EMAIL_FROM}`);
-  
+  console.log(`[MAILER] Using Brevo HTTP API`);
+  console.log(`[MAILER] Sending to: ${options.to}`);
+
   try {
-    const info = await transporter.sendMail(message);
-    console.log(`[MAILER] Email sent successfully! ID: ${info.messageId}`);
-    return info;
+    const response = await axios.post(
+      "https://api.brevo.com/v3/smtp/email",
+      emailData,
+      {
+        headers: {
+          "api-key": apiKey,
+          "Content-Type": "application/json",
+          "accept": "application/json"
+        },
+        timeout: 10000 // 10 second timeout
+      }
+    );
+
+    console.log(`[MAILER] Success! Message ID: ${response.data.messageId}`);
+    return response.data;
   } catch (error) {
     console.error(`[MAILER] ERROR: Failed to send email to ${options.to}`);
-    console.error(`[MAILER] DETAILS:`, error.message);
-    throw error; // Re-throw to be handled by controller
+    
+    // Log detailed API error if available
+    if (error.response) {
+      console.error(`[MAILER] API 4xx/5xx Error:`, error.response.status, JSON.stringify(error.response.data));
+    } else {
+      console.error(`[MAILER] Network/Code Error:`, error.message);
+    }
+    
+    throw error;
   }
 };
 

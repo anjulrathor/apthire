@@ -1,11 +1,14 @@
 const nodemailer = require("nodemailer");
 
 const sendEmail = async (options) => {
+  // Configure Brevo SMTP transport
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: process.env.BREVO_SMTP_HOST,
+    port: parseInt(process.env.BREVO_SMTP_PORT),
+    secure: false, // Use STARTTLS
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
+      user: process.env.BREVO_SMTP_USER,
+      pass: process.env.BREVO_SMTP_PASS,
     },
     // Add timeouts to prevent hanging
     connectionTimeout: 10000, 
@@ -13,18 +16,19 @@ const sendEmail = async (options) => {
   });
 
   const message = {
-    from: `"Apthire Security" <${process.env.EMAIL_USER}>`,
+    from: `"Apthire Security" <${process.env.EMAIL_FROM}>`,
     to: options.to,
     subject: options.subject,
     html: options.html,
   };
 
+  console.log(`[MAILER] Using Brevo SMTP`);
   console.log(`[MAILER] Preparing to send email to: ${options.to}`);
-  console.log(`[MAILER] Using Email: ${process.env.EMAIL_USER}`);
+  console.log(`[MAILER] From: ${process.env.EMAIL_FROM}`);
   
   try {
     const info = await transporter.sendMail(message);
-    console.log(`[MAILER] SUCCESS: Email sent! ID: ${info.messageId}`);
+    console.log(`[MAILER] Email sent successfully! ID: ${info.messageId}`);
     return info;
   } catch (error) {
     console.error(`[MAILER] ERROR: Failed to send email to ${options.to}`);

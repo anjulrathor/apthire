@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { CheckCircle2, Zap, Target, Users, BarChart3, ShieldCheck } from "lucide-react";
 
 export default function ServicesPage() {
@@ -86,9 +87,9 @@ export default function ServicesPage() {
             <p className="mb-8 opacity-90">
               We offer enterprise solutions and managed hiring services for high-growth tech teams.
             </p>
-            <button className="bg-white text-emerald-600 px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition shadow-lg">
+            <Link href="/contact" className="bg-white text-emerald-600 px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition shadow-lg inline-block">
               Contact Sales
-            </button>
+            </Link>
           </div>
         </div>
 

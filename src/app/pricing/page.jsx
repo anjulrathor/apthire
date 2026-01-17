@@ -1,12 +1,13 @@
 "use client";
 import React from "react";
+import Link from "next/link";
 import { Check, Zap, Building2, Flame } from "lucide-react";
 
 export default function PricingPage() {
   const plans = [
     {
       name: "Starter",
-      price: "0",
+      price: "Free",
       description: "Perfect for students and individuals just starting their career journey.",
       icon: <Zap className="w-6 h-6 text-emerald-500" />,
       features: [
@@ -15,12 +16,13 @@ export default function PricingPage() {
         "Join 10 job pipelines / month",
         "Public portfolio link"
       ],
-      cta: "Start for Free",
-      highlight: false
+      cta: "Coming Soon",
+      highlight: false,
+      comingSoon: true
     },
     {
       name: "Pro",
-      price: "1,499",
+      price: "Coming Soon",
       description: "For active job seekers who want to stand out and get hired faster.",
       icon: <Flame className="w-6 h-6 text-orange-500" />,
       features: [
@@ -30,12 +32,13 @@ export default function PricingPage() {
         "Advanced profile analytics",
         "Direct recruiter messaging"
       ],
-      cta: "Get Started",
-      highlight: true
+      cta: "Coming Soon",
+      highlight: true,
+      comingSoon: true
     },
     {
       name: "Business",
-      price: "9,999",
+      price: "Coming Soon",
       description: "For startups and small teams looking to hire the best talent quickly.",
       icon: <Building2 className="w-6 h-6 text-blue-500" />,
       features: [
@@ -45,8 +48,9 @@ export default function PricingPage() {
         "Team collaboration (3 seats)",
         "Automated interview scoring"
       ],
-      cta: "Hire with Pro",
-      highlight: false
+      cta: "Coming Soon",
+      highlight: false,
+      comingSoon: true
     }
   ];
 
@@ -92,8 +96,12 @@ export default function PricingPage() {
               </div>
 
               <div className="mb-8 font-head">
-                <span className="text-5xl font-bold text-white">₹{plan.price}</span>
-                <span className="text-gray-500 text-sm ml-2">/month</span>
+                {plan.price === "Free" ? (
+                   <span className="text-5xl font-bold text-white">Free</span>
+                ) : (
+                   <span className="text-4xl font-bold text-white uppercase tracking-tight">{plan.price}</span>
+                )}
+                {plan.price !== "Coming Soon" && plan.price !== "Free" && <span className="text-gray-500 text-sm ml-2">/month</span>}
               </div>
 
               <ul className="space-y-4 mb-10">
@@ -105,10 +113,12 @@ export default function PricingPage() {
                 ))}
               </ul>
 
-              <button className={`w-full py-4 rounded-xl font-bold text-sm transition-all shadow-xl ${
+              <button 
+                disabled={true}
+                className={`w-full py-4 rounded-xl font-bold text-sm transition-all shadow-xl opacity-80 cursor-not-allowed ${
                 plan.highlight 
-                  ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20" 
-                  : "bg-white/5 hover:bg-white/10 text-white border border-white/5"
+                  ? "bg-emerald-600/50 text-white/50" 
+                  : "bg-white/5 text-white/50 border border-white/5"
               }`}>
                 {plan.cta}
               </button>
@@ -122,9 +132,9 @@ export default function PricingPage() {
            <p className="text-gray-400 mb-8 max-w-xl mx-auto">
              For enterprises looking for custom integrations, managed recruitment, and unlimited hiring seats.
            </p>
-           <button className="px-8 py-3 bg-white text-black font-bold rounded-full hover:bg-gray-200 transition">
+           <Link href="/contact" className="px-8 py-3 bg-white text-black font-bold rounded-full hover:bg-gray-200 transition inline-block">
              Contact Sales
-           </button>
+           </Link>
         </div>
       </div>
     </main>

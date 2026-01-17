@@ -43,34 +43,18 @@ export default function CareersPage() {
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-12">
             <h2 className="text-3xl font-bold text-white">Open Positions</h2>
             <span className="px-4 py-1.5 bg-emerald-500/10 text-emerald-500 rounded-full text-xs font-bold uppercase tracking-widest border border-emerald-500/20">
-              3 Opportunities
+              Looking for talent?
             </span>
           </div>
 
           <div className="space-y-4">
-            {[
-              { role: "Senior Full Stack Engineer", team: "Engineering", type: "Full-time" },
-              { role: "Product Designer", team: "Design", type: "Full-time" },
-              { role: "Community Manager", team: "Marketing", type: "Part-time" }
-            ].map((job, i) => (
-              <div key={i} className="group flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-[#0a0a0a] border border-white/5 rounded-2xl hover:border-emerald-500/30 transition-all cursor-pointer">
-                <div>
-                  <h4 className="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors mb-1">{job.role}</h4>
-                  <div className="flex gap-4 text-xs text-gray-500">
-                    <span>{job.team}</span>
-                    <span>•</span>
-                    <span>{job.type}</span>
-                  </div>
-                </div>
-                <div className="mt-4 sm:mt-0 flex items-center gap-2 text-emerald-500 text-sm font-bold group-hover:gap-3 transition-all">
-                  Apply Now <ArrowRight className="w-4 h-4" />
-                </div>
-              </div>
-            ))}
+          <div className="space-y-4 text-center py-12 text-gray-400">
+             <p>No open positions right now.</p>
+          </div>
           </div>
           
           <div className="mt-12 text-center text-gray-500 text-sm">
-            Don't see a fit? Send us an open application at <span className="text-emerald-500 font-bold">anjulrathor.dev@gmail.com</span>
+            Don't see a fit? Send us an open application at <span className="text-emerald-500 font-bold">apthire.care@gmail.com</span>
           </div>
         </div>
       </div>

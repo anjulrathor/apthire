@@ -68,7 +68,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 text-xs">
-          <p>© {new Date().getFullYear()} Apthire. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Apthire. All rights reserved. Created by <a href="https://www.anjulrathor.com" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 transition-colors">Anjul Rathor</a></p>
           <p className="flex items-center gap-1">
             Build for the future of work <span className="text-emerald-500">✦</span> Skill-first hiring
           </p>

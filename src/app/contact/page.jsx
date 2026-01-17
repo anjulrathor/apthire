@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Linkedin, Mail, MapPin, ArrowRight } from "lucide-react";
 
-const EMAIL = "anjulrathor.dev@gmail.com";
+const EMAIL = "apthire.care@gmail.com";
 const LINKEDIN = "https://www.linkedin.com/in/anjulrathor/";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
 

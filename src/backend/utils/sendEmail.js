@@ -2,17 +2,18 @@ const nodemailer = require("nodemailer");
 
 const sendEmail = async (options) => {
   // Configure Brevo SMTP transport
+  const port = parseInt(process.env.BREVO_SMTP_PORT);
   const transporter = nodemailer.createTransport({
     host: process.env.BREVO_SMTP_HOST,
-    port: parseInt(process.env.BREVO_SMTP_PORT),
-    secure: false, // Use STARTTLS
+    port: port,
+    secure: port === 465, // True for 465, false for other ports
     auth: {
       user: process.env.BREVO_SMTP_USER,
       pass: process.env.BREVO_SMTP_PASS,
     },
     // Add timeouts to prevent hanging
-    connectionTimeout: 10000, 
-    socketTimeout: 10000 
+    connectionTimeout: 20000, 
+    socketTimeout: 20000 
   });
 
   const message = {

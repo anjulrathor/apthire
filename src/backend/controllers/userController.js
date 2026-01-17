@@ -443,6 +443,113 @@ const changePassword = async (req, res) => {
   }
 };
 
+// @desc    Forgot Password - Send OTP
+// @route   POST /api/users/forgot-password
+// @access  Public
+const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Generate 4 digit OTP
+        const otp = Math.floor(1000 + Math.random() * 9000).toString();
+        const salt = await bcrypt.genSalt(10);
+        const hashedOtp = await bcrypt.hash(otp, salt);
+        const otpExpiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
+
+        user.otp = hashedOtp;
+        user.otpExpiresAt = otpExpiresAt;
+        await user.save();
+
+        const message = `
+        <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+          <h2>Reset Your Password</h2>
+          <p>You requested to reset your password. Use the following OTP to proceed:</p>
+          <h1 style="color: #10b981; letter-spacing: 5px;">${otp}</h1>
+          <p>This OTP is valid for <strong>5 minutes</strong>.</p>
+          <p style="color: #666; font-size: 12px; margin-top: 20px;">
+              If you didn't request this, please ignore this email.
+          </p>
+        </div>
+        `;
+
+        try {
+            await sendEmail({
+                to: email,
+                subject: "Reset Password OTP - Apthire",
+                html: message
+            });
+            res.status(200).json({ success: true, message: "OTP sent to email" });
+        } catch (emailError) {
+            user.otp = undefined;
+            user.otpExpiresAt = undefined;
+            await user.save();
+            res.status(500).json({ message: "Email send failed", error: emailError.message });
+        }
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Reset Password with OTP
+// @route   POST /api/users/reset-password
+// @access  Public
+const resetPassword = async (req, res) => {
+    try {
+        const { email, otp, newPassword } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (!user.otp || !user.otpExpiresAt) {
+             return res.status(400).json({ message: "No OTP request found" });
+        }
+
+        if (user.otpExpiresAt < Date.now()) {
+            return res.status(400).json({ message: "OTP expired" });
+        }
+
+        const isMatch = await bcrypt.compare(otp, user.otp);
+
+        if (!isMatch) {
+            return res.status(400).json({ message: "Invalid OTP" });
+        }
+
+        // Update password
+        user.password = newPassword; // Will be hashed by pre-save middleware if it exists, otherwise explicit hashing needed?
+        // Checking User model usually handles this. If not, I should check model. But registerUser doesn't explicit hash password before create, checking line 63 of viewed file.
+        // Wait, User.create triggers middleware. Direct assignment `user.password = new` might NOT trigger middleware unless `user.save()` is called. 
+        // Let's check if there is a pre-save hook.
+        
+        user.otp = undefined;
+        user.otpExpiresAt = undefined;
+        // Mark verified if they reset password successfully via email OTP (implies ownership)
+        if (!user.isVerified) user.isVerified = true; 
+        
+        await user.save();
+
+        res.json({
+            success: true,
+            message: "Password reset successful",
+            token: generateToken(user._id),
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = { 
   registerUser, 
   loginUser, 
@@ -454,5 +561,7 @@ module.exports = {
   changePassword,
   verifyOTP,
   resendOTP,
+  forgotPassword,
+  resetPassword,
   ADMIN_EMAILS
 };

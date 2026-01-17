@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/context/ToastContext";
+import { useAuth } from "@/context/AuthContext";
 import Logo from "@/components/ui/Logo";
 
 export default function SignUpPage() {
@@ -119,6 +120,8 @@ export default function SignUpPage() {
     }
   }
 
+  const { login } = useAuth();
+
   async function handleVerifyOTP(e) {
     e.preventDefault();
 
@@ -143,10 +146,20 @@ export default function SignUpPage() {
         throw new Error(data?.message || "Verification failed");
       }
 
-      success("Email verified! Redirecting to login...");
-      setTimeout(() => {
-          window.location.href = "/login";
-      }, 1500);
+      success("Email verified! Logging you in...");
+      
+      // Auto-login user
+      // Construct user object similar to what login expects
+      const userData = {
+        _id: data._id,
+        name: data.name,
+        email: data.email,
+        role: data.role,
+        profile: data.profile 
+      };
+      
+      login(userData, data.token);
+
     } catch (err) {
         toastError(err.message || "Verification failed");
     } finally {

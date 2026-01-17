@@ -9,6 +9,12 @@ const sendEmail = async (options) => {
     throw new Error("Email configuration error: API Key missing");
   }
 
+  if (apiKey.startsWith("xsmtpsib-")) {
+    console.error("[MAILER] FATAL: You provided an SMTP Key (xsmtpsib-...), but the API requires an API Key (xkeysib-...).");
+    console.error("[MAILER] FIX: Go to Brevo -> SMTP & API -> API Keys tab -> Generate new key.");
+    throw new Error("Configuration Error: Invalid API Key type. Get a v3 API Key starting with 'xkeysib-'.");
+  }
+
   const emailData = {
     sender: {
       name: "Apthire Security",

@@ -21,6 +21,8 @@ const allowedOrigins = [
   "http://localhost:3000",
   "https://apthire.vercel.app",
   "https://www.apthire.vercel.app",
+  "https://apthire.anjulrathor.com",
+  "https://www.apthire.anjulrathor.com",
   process.env.FRONTEND_URL
 ].filter(Boolean); // Remove undefined values
 

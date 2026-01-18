@@ -55,6 +55,11 @@ app.use(passport.initialize());
 // DB
 connectDB();
 
+// Health Check Route
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
+});
+
 // Test Route
 app.get("/api/test-email", async (req, res) => {
     try {
